@@ -52,6 +52,8 @@ Here is a less distorted representation of the distance map:
 
 <img src="pics/Distancegif.gif" alt="distance_globe" class="inline"/>
 
+( [Created at maptoglobe.com](https://www.maptoglobe.com) )
+
 # Useful Links
 
 [Description of the ray tracing algorithm used](https://www.scratchapixel.com/lessons/3d-basic-rendering/minimal-ray-tracer-rendering-simple-shapes/ray-sphere-intersection)
