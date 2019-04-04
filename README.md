@@ -21,9 +21,9 @@ this ray stops and returns properties about the sphere it hits
 
 MLHOUSE aggregates these ray-tracing results into an image that is fed into a neural network.
 The network is trained to predict two properties:
-(1) the Rosetta energy of the residue after performing fixed-backbone rotamer substitution
-(packing, can incorporate design) and
-(2) the DDG of binding _after_ packing is performed in the bound state.
+(1) the Rosetta energy of the residue after [performing fixed-backbone rotamer substitution
+(packing, can incorporate design)](https://www.rosettacommons.org/demos/latest/tutorials/Optimizing_Sidechains_The_Packer/Optimizing_Sidechains_The_Packer) and
+(2) the binding energy _after_ packing is performed in the bound state.
 
 
 # What Parameters Are Collected?
