@@ -4,7 +4,7 @@
 
 <img src="pics/3U3B_resid50.distance.png" alt="distance" class="inline"/>
 
-Black represents close objects and white represents far objects.
+Darker objects represent shorter distances.
 
 ## BB Oritentation
 
