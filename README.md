@@ -37,12 +37,20 @@ the background is black.
 
 ## Amino Acid Designability
 
-<img src="pics/3U3B_resid50.res_10.png" alt="chain" class="inline"/>
+<img src="pics/3U3B_resid50.res_10.png" alt="aa" class="inline"/>
 
 This image is generated for each of the 20 amino acids.
 Residues that can adopt that amino acid identity are colored white,
 even if they have a different amino acid identity to start out.
 A residue position that can adopt all 20 amino acids will be white in every picture.
+
+# Globe Representation
+
+The pictures shown above are naturally distorted so that the
+north and south poles are stretched wide.
+Here is a less distorted representation of the distance map:
+
+<img src="pics/Distancegif.gif" alt="distance_globe" class="inline"/>
 
 # Useful Links
 
