@@ -62,6 +62,7 @@ but the algorithm uses 9 degree resolution (40 x 20) as shown below.
 
 ## Distance
 
+[small_distance](pics/3U3B_resid50.9deg.distance.png)
 <img src="pics/3U3B_resid50.9deg.distance.png" alt="distance" class="inline"/>
 
 ## BB Oritentation
