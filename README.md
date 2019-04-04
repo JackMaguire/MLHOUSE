@@ -1,3 +1,9 @@
+# Overview
+
+MLHOUSE is a neural network that is trained to predict the high-resolution
+[Rosetta](https://www.rosettacommons.org) energy of a protein
+with [low-resolution](https://www.rosettacommons.org/demos/latest/tutorials/full_atom_vs_centroid/fullatom_centroid) modeling.
+
 # What Parameters Are Collected?
 
 ## Distance
@@ -77,6 +83,7 @@ but the algorithm uses 9 degree resolution (40 x 20) as shown below.
 <img src="pics/3U3B_resid50.9deg.chain.png" alt="chain" class="inline" width="360" height="180"/>
 
 # Useful Links
+[Rosetta's Full Atom Representation vs Centroid Representation](https://www.rosettacommons.org/demos/latest/tutorials/full_atom_vs_centroid/fullatom_centroid)
 
 [Description of the ray tracing algorithm used](https://www.scratchapixel.com/lessons/3d-basic-rendering/minimal-ray-tracer-rendering-simple-shapes/ray-sphere-intersection)
 
