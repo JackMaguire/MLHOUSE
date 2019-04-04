@@ -62,20 +62,19 @@ but the algorithm uses 9 degree resolution (40 x 20) as shown below.
 
 ## Distance
 
-[small_distance](pics/3U3B_resid50.9deg.distance.png)
-<img src="pics/3U3B_resid50.9deg.distance.png" alt="distance" class="inline"/>
+<img src="pics/3U3B_resid50.9deg.distance.png" alt="distance" class="inline" width="360" height="180"/>
 
 ## BB Oritentation
 
-<img src="pics/3U3B_resid50.9deg.bb_orientation_angle_rad.png" alt="BB" class="inline"/>
+<img src="pics/3U3B_resid50.9deg.bb_orientation_angle_rad.png" alt="BB" class="inline" width="360" height="180"/>
 
 ## Distance From Center
 
-<img src="pics/3U3B_resid50.9deg.thc.png" alt="Thc" class="inline"/>
+<img src="pics/3U3B_resid50.9deg.thc.png" alt="Thc" class="inline" width="360" height="180"/>
 
 ## Chain ID
 
-<img src="pics/3U3B_resid50.9deg.chain.png" alt="chain" class="inline"/>
+<img src="pics/3U3B_resid50.9deg.chain.png" alt="chain" class="inline" width="360" height="180"/>
 
 # Useful Links
 
