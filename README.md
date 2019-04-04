@@ -4,13 +4,21 @@
 
 <img src="pics/3U3B_resid50.distance.png" alt="distance" class="inline"/>
 
+Black represents close objects and white represents far objects.
+
 ## BB Oritentation
 
 <img src="pics/3U3B_resid50.bb_orientation_angle_rad.png" alt="BB" class="inline"/>
 
+Black represents being close to the backbone of the sphere,
+white represents being on the sidechain end of the sphere.
+
 ## Distance From Center
 
 <img src="pics/3U3B_resid50.thc.png" alt="Thc" class="inline"/>
+
+This one is complicated, but it is meant to portray the relationship between the ray and the center of the intersecting sphere.
+Black represents a smaller value of Thc (in the picture below) and white is a larger value.
 
 ![THC](https://www.scratchapixel.com/images/upload/ray-simple-shapes/raysphereisect1.png)
 
