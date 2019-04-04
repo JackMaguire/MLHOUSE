@@ -27,6 +27,15 @@ the gray spheres are part of a different chain, and
 (for the sake of this image)
 the background is black.
 
+## Amino Acid Designability
+
+<img src="pics/3U3B_resid50.res_10.png" alt="chain" class="inline"/>
+
+This image is generated for each of the 20 amino acids.
+Residues that can adopt that amino acid identity are colored white,
+even if they have a different amino acid identity to start out.
+A residue position that can adopt all 20 amino acids will be white in every picture.
+
 # Useful Links
 
 [Description of the ray tracing algorithm used](https://www.scratchapixel.com/lessons/3d-basic-rendering/minimal-ray-tracer-rendering-simple-shapes/ray-sphere-intersection)
