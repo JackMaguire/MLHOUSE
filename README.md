@@ -27,6 +27,10 @@ the gray spheres are part of a different chain, and
 (for the sake of this image)
 the background is black.
 
-# Ray Tracing Process
+# Useful Links
+
+[Description of the ray tracing algorithm used](https://www.scratchapixel.com/lessons/3d-basic-rendering/minimal-ray-tracer-rendering-simple-shapes/ray-sphere-intersection)
+
+[Ray Tracing in 256 lines of C++](https://github.com/ssloy/tinyraytracer)
 
 <!-- For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/). -->
