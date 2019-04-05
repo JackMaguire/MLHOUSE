@@ -60,7 +60,7 @@ parser.add_argument( "--starting_epoch", help="For bookkeeping purposes, what is
 parser.add_argument( "--epoch_checkpoint_frequency", help="How often should we be saving models?", type=int, required=True )
 parser.add_argument( "--num_epochs", help="Number of epochs to run.", type=int, required=True )
 
-#args = parser.parse_args()
+args = parser.parse_args()
 
 #num_neurons_in_first_hidden_layer = args.num_neurons_in_first_hidden_layer
 #print( "num_neurons_in_first_hidden_layer: " + str( num_neurons_in_first_hidden_layer ) )
