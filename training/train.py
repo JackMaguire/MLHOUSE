@@ -79,6 +79,8 @@ def assert_vecs_line_up( input, output ):
     #Each line starts with "RESID: XXX,"
     my_assert_equals( "input file length", len( input ), len( output ) )
     for i in range( 0, len( input ) ):
+        print( input[ i ] )
+        exit( 0 )
         in_line = input[ i ]
         in_elem = in_line.split( "," )[ 0 ]
         in_resid = int( in_elem.split( " " )[ 1 ] )
