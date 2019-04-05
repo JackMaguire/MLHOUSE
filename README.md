@@ -19,10 +19,20 @@ Instead of deflecting like a normal ray-tracing algorithm,
 this ray stops and returns properties about the sphere it hits
 (outlines in the nexted section).
 
-MLHOUSE aggregates these ray-tracing results into an image that is fed into a neural network.
-The network is trained to predict two properties:
-(1) the Rosetta energy of the residue after [performing fixed-backbone rotamer substitution
-(packing, can incorporate design)](https://www.rosettacommons.org/demos/latest/tutorials/Optimizing_Sidechains_The_Packer/Optimizing_Sidechains_The_Packer) and
+<img src="pics/CartoonDescription.png" alt="distance" class="inline"/>
+
+> (A) In centroid (or "low resolution") mode, each residue is represented by one sphere. This picture shows 4 residues.
+
+> (B) To get the energy for the middle residue, MLHOUSE casts rays in all directions. Each ray stops when it hits another sphere.
+
+> (C) Working clockwise from the 12:00 position, this is what the "Distance vs Angle" plot looks like. You can see the distance decrease when it hits a sphere, then return to the maximum value (rays don't travel more than 16 Å).
+
+> (D) We see a much clearer picture of the spheres when we increase the sampling resolution from 45 degrees to 1 degree.
+
+The cartoon above only casts rays in 2D space, resulting in a 1D vector (subfigure D).
+MLHOUSE operates in 3D space, so the rays create a 2D vector that can be interpretted as an image (see below).
+This image is then fed into a [deep neural network](https://en.wikipedia.org/wiki/Deep_learning#Deep_neural_networks) that is trained to predict two properties:
+(1) the Rosetta energy of the residue after [performing fixed-backbone rotamer substitution](https://www.rosettacommons.org/demos/latest/tutorials/Optimizing_Sidechains_The_Packer/Optimizing_Sidechains_The_Packer) (known as "packing", can incorporate design) and
 (2) the binding energy _after_ packing is performed in the bound state.
 
 
