@@ -137,10 +137,10 @@ for line in file:
     input, output = generate_data_from_files( line )    
     results = model.evaluate( x=input, y=output )
     print( results )
-    for i in range( 0, len( input ) ):
-        prediction = model.predict( x=numpy.transpose(input[i]) )
-        print( output[i] )
-        print( prediction )
+
+    predictions = model.predict( x=temp[0:1] )
+    #print( output[i] )
+    print( predictions )
 
 file.close()
 
