@@ -139,7 +139,7 @@ def mean_pred( y_true, y_pred ):
 
 
 if os.path.isfile( args.model ):
-    model = load_model( "best.h5" )
+    model = load_model( args.model )
 else:
     print( "Model " + args.model + " is not a file" )
     exit( 1 )
