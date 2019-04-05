@@ -1,4 +1,4 @@
-import os
+1;95;0cimport os
 #os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
 #os.environ["CUDA_VISIBLE_DEVICES"] = ""
 
@@ -36,62 +36,27 @@ full_name = "~/MLHOUSE/.git".replace( "~", path )
 sha1 = subprocess.check_output(["git", "--git-dir", full_name, "rev-parse", "HEAD"]).strip()
 print ( "JackMaguire/MLHOUSE: " + str( sha1 ) )
 
-exit( 0 )
-
-#############
-# CONSTANTS #
-#############
-
-#0                         1                          2  3  4  5  6  7  8      9      10
-#best_possible_hbond_score,worst_possible_clash_score,tx,ty,tz,rz,ry,rz,angle1,angle2,dist
-
-BEST_POSSIBLE_HBOND_SCORE  = int( 0 )
-WORST_POSSIBLE_CLASH_SCORE = int( 1 )
-
-TX = int( 2 )
-TY = int( 3 )
-TZ = int( 4 )
-
-RX = int( 5 )
-RY = int( 6 )
-RZ = int( 7 )
-
-ANGLE1 = int( 8 )
-ANGLE2 = int( 9 )
-DIST   = int( 10 )
-
-#########################
-# COMMAND LINE SETTINGS #
-#########################
-
 parser = argparse.ArgumentParser()
 
-parser.add_argument( "--num_neurons_in_first_hidden_layer", help="Number of neruons for first hidden layer.", default="100", type=int, required=False )
-parser.add_argument( "--num_neurons_in_intermediate_hidden_layer", help="Number of neruons for intermediate hidden layer.", default="100", type=int, required=False )
-parser.add_argument( "--num_intermediate_hidden_layers", help="Number of intermediate hidden layers.", default="4", type=int, required=False )
+parser.add_argument( "--model", help="Most recent model file", required=True )
 
-parser.add_argument( "--num_epochs", help="Number of epochs to give to model.fit()", default="150", type=int, required=False )
+parser.add_argument( "--training_data", help="CSV where each line has two elements. First element is the absolute path to the input csv file, second element is the absolute path to the corresponding output csv file.", required=True )
+# Example: "--training_data foo.csv" where foo.csv looks like:
+# /home/jack/input.1.csv,/home/jack/output.1.csv
+# /home/jack/input.2.csv,/home/jack/output.2.csv
+# /home/jack/input.3.csv,/home/jack/output.3.csv
+# ...
 
-parser.add_argument( "--test_predictions", help="filename for test predictions", default="", required=False )
-
-#parser.add_argument( "--weight", help="Class weight for 1", default="3.0", required=True )
+parser.add_argument( "--starting_epochs", help="For bookkeeping purposes, what is the epoch number of the model loaded with --model?", type=int, required=True )
+parser.add_argument( "--epoch_checkpoint_frequency", help="How often should we be saving models?", type=int, required=True )
+parser.add_argument( "--num_epochs", help="Number of epochs to run. 0 means infinite loop.", type=int, required=True )
 
 args = parser.parse_args()
 
-num_neurons_in_first_hidden_layer = args.num_neurons_in_first_hidden_layer
-print( "num_neurons_in_first_hidden_layer: " + str( num_neurons_in_first_hidden_layer ) )
+exit( 0 )
 
-num_neurons_in_intermediate_hidden_layer = args.num_neurons_in_intermediate_hidden_layer
-print( "num_neurons_in_intermediate_hidden_layer: " + str( num_neurons_in_intermediate_hidden_layer ) )
-
-num_intermediate_hidden_layers = args.num_intermediate_hidden_layers
-print( "num_intermediate_hidden_layers: " + str( num_intermediate_hidden_layers ) )
-
-num_epochs = args.num_epochs #150 is small
-print( "num_epochs: " + str( num_epochs ) )
-
-#weight1 = args.weight
-#print( "class weight for 1: " + str( weight1 ) );
+#num_neurons_in_first_hidden_layer = args.num_neurons_in_first_hidden_layer
+#print( "num_neurons_in_first_hidden_layer: " + str( num_neurons_in_first_hidden_layer ) )
 
 #########
 # FUNCS #
