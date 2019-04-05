@@ -134,9 +134,13 @@ else:
 file = open( args.testing_data, "r" )
 
 for line in file:
-    input, output = generate_data_from_files( line )
+    input, output = generate_data_from_files( line )    
     results = model.evaluate( x=input, y=output )
     print( results )
+    for i in range( 0, len( input ) ):
+        prediction = model.predict( x=input[i] )
+        print( input[i] )
+        print( prediction )
 
 file.close()
 
