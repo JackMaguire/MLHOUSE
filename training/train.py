@@ -29,9 +29,9 @@ import subprocess
 ########
 
 num_input_dimensions = 20021
-num_neurons_in_layer1 = 8000
+num_neurons_in_layer1 = 4000
 num_neurons_in_layer2 = 2000
-num_neurons_in_layer3 = 800
+num_neurons_in_layer3 = 500
 num_neurons_in_layer4 = 100
 num_output_dimensions = 2
 
