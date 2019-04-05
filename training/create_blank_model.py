@@ -53,7 +53,7 @@ model.add( Dense( num_neurons_in_layer1, input_dim=num_input_dimensions, activat
 model.add( Dense( num_neurons_in_layer2, activation='relu') )
 model.add( Dense( num_neurons_in_layer3, activation='relu') )
 model.add( Dense( num_neurons_in_layer4, activation='relu') )
-Dense( num_output_dimensions, activation='sigmoid')
+model.add( Dense( num_output_dimensions, activation='linear') )
 
 # 3) Compile Model
 
