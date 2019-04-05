@@ -49,6 +49,8 @@ parser = argparse.ArgumentParser()
 
 parser.add_argument( "--model", help="Most recent model file", required=True )
 
+parser.add_argument( "--evaluate_individually", help="Print predictions vs actual data", type=bool, default=False )
+
 parser.add_argument( "--testing_data", help="CSV where each line has two elements. First element is the absolute path to the input csv file, second element is the absolute path to the corresponding output csv file.", required=True )
 # Example: "--testing_data foo.csv" where foo.csv looks like:
 # /home/jack/input.1.csv,/home/jack/output.1.csv
@@ -135,14 +137,18 @@ file = open( args.testing_data, "r" )
 
 for line in file:
     input, output = generate_data_from_files( line )    
-    print( len( input ) )
 
-    results = model.evaluate( x=input, y=output )
-    print( results )
+    #one-by-one output
+    if args.evaluate_individually:
+        predictions = model.predict( x=input[:] )
+        print ( "ActualScore\tPredictedScore\tActualDDG\tPredictedDDG" );
+        for i in range( 0, len( input ) ):
+            print( str( output[ i ][ 0 ] ) + "\t" + str( predictions[ i ][ 0 ] ) + "\t" + str( output[ i ][ 1 ] ) + "\t" + str( predictions[ i ][ 1 ] ) )
+    else:
+        results = model.evaluate( x=input, y=output )
+        print( results )
 
-    predictions = model.predict( x=input[0:1] )
-    #print( output[i] )
-    print( predictions )
+
 
 file.close()
 
