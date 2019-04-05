@@ -1,0 +1,59 @@
+import os
+os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
+os.environ["CUDA_VISIBLE_DEVICES"] = ""
+
+#from keras import *
+from keras.models import Sequential
+from keras.layers import Dense
+from keras import metrics
+
+from keras.models import load_model
+import keras.backend as K
+import keras.callbacks
+import keras
+import numpy
+
+import sys
+#sys.path.append("/nas/longleaf/home/jackmag")#for h5py
+import h5py
+
+import argparse
+import random
+import time
+import subprocess
+
+########
+# INIT #
+########
+
+numpy.random.seed( 0 )
+
+#Get sha1
+pwd = os.path.realpath(__file__)
+MLHOUSE_index = pwd.find( "MLHOUSE" )
+path = pwd[:MLHOUSE_index]
+full_name = "~/MLHOUSE/.git".replace( "~", path )
+sha1 = subprocess.check_output(["git", "--git-dir", full_name, "rev-parse", "HEAD"]).strip()
+print ( "JackMaguire/MLHOUSE: " + str( sha1 ) )
+
+parser = argparse.ArgumentParser()
+parser.add_argument( "--model", help="filename for output file", default="blank_model", required=False )
+args = parser.parse_args()
+
+
+num_input_dimensions = 9
+model = Sequential()
+
+model.add( Dense( num_neurons_in_first_hidden_layer, input_dim=num_input_dimensions, activation='relu') )
+
+for x in range( 0, num_intermediate_hidden_layers ):
+    model.add( Dense( num_neurons_in_intermediate_hidden_layer, activation='relu') )
+
+num_neurons_in_final_layer = int( 2 )
+model.add( Dense( num_neurons_in_final_layer, activation='sigmoid') ) #TODO check this
+
+# 3) Compile Model
+
+metrics_to_output=[ 'accuracy' ]
+model.compile( loss='binary_crossentropy', optimizer='adam', metrics=metrics_to_output )
+model.save( args.model + ".h5" )
