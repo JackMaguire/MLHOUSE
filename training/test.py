@@ -50,7 +50,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument( "--model", help="Most recent model file", required=True )
 
 parser.add_argument( "--testing_data", help="CSV where each line has two elements. First element is the absolute path to the input csv file, second element is the absolute path to the corresponding output csv file.", required=True )
-# Example: "--training_data foo.csv" where foo.csv looks like:
+# Example: "--testing_data foo.csv" where foo.csv looks like:
 # /home/jack/input.1.csv,/home/jack/output.1.csv
 # /home/jack/input.2.csv,/home/jack/output.2.csv
 # /home/jack/input.3.csv,/home/jack/output.3.csv
@@ -133,7 +133,7 @@ else:
 # 4) Test Model
 for epoch in range( starting_epoch + 1, last_epoch + 1 ):
 
-    file = open( args.training_data, "r" )
+    file = open( args.testing_data, "r" )
 
     for line in file:
         input, output = generate_data_from_files( line )
