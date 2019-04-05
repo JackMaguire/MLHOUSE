@@ -34,7 +34,7 @@ MLHOUSE_index = pwd.find( "MLHOUSE" )
 path = pwd[:MLHOUSE_index]
 full_name = "~/MLHOUSE/.git".replace( "~", path )
 sha1 = subprocess.check_output(["git", "--git-dir", full_name, "rev-parse", "HEAD"]).strip()
-print ( "JackMaguire/MLHOUSE: " + sha1 )
+print ( "JackMaguire/MLHOUSE: " + str( sha1 ) )
 
 exit( 0 )
 
