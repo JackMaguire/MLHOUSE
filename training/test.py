@@ -138,7 +138,7 @@ for line in file:
     results = model.evaluate( x=input, y=output )
     print( results )
 
-    predictions = model.predict( x=temp[0:1] )
+    predictions = model.predict( x=input[0:1] )
     #print( output[i] )
     print( predictions )
 
