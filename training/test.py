@@ -131,14 +131,12 @@ else:
     exit( 1 )
 
 # 4) Test Model
-for epoch in range( starting_epoch + 1, last_epoch + 1 ):
+file = open( args.testing_data, "r" )
 
-    file = open( args.testing_data, "r" )
+for line in file:
+    input, output = generate_data_from_files( line )
+    results = model.evaluate( x=input, y=output )
+    print( results )
 
-    for line in file:
-        input, output = generate_data_from_files( line )
-        results = model.evaluate( x=input, y=output )
-        print( results )
-
-    file.close()
+file.close()
 
