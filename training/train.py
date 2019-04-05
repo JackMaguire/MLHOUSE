@@ -79,7 +79,6 @@ def assert_vecs_line_up( input, output ):
     #Each line starts with "RESID: XXX,"
     my_assert_equals( "input file length", len( input ), len( output ) )
     for i in range( 0, len( input ) ):
-        print( input[ i ] )
         in_elem = input[ i ][ 0 ]
         in_resid = int( in_elem.split( " " )[ 1 ] )
         out_elem = output[ i ][ 0 ]
@@ -95,10 +94,10 @@ def generate_data_from_files( filenames_csv ):
     input  = pd.read_csv( split[ 0 ] ).values
     output = pd.read_csv( split[ 1 ] ).values
 
-    print( type( input ) )
-
     assert_vecs_line_up( input, output )
    
+    print( input )
+
     return input, output
 
 generate_data_from_files( "../sample_data/sample.repack.input.csv,../sample_data/sample.repack.output.csv" )
