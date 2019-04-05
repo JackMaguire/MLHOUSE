@@ -98,6 +98,10 @@ def generate_data_from_files( filenames_csv ):
    
     print( input )
 
+    input.drop( 0 )
+
+    print( input )
+
     return input, output
 
 generate_data_from_files( "../sample_data/sample.repack.input.csv,../sample_data/sample.repack.output.csv" )
