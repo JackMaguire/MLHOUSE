@@ -138,8 +138,8 @@ for line in file:
     results = model.evaluate( x=input, y=output )
     print( results )
     for i in range( 0, len( input ) ):
-        prediction = model.predict( x=input[i] )
-        print( input[i] )
+        prediction = model.predict( x=numpy.transpose(input[i]) )
+        print( output[i] )
         print( prediction )
 
 file.close()
