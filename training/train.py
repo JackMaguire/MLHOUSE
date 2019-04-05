@@ -17,6 +17,8 @@ import sys
 #sys.path.append("/nas/longleaf/home/jackmag")#for h5py
 import h5py
 
+import pandas as pd
+
 import argparse
 import random
 import time
@@ -51,9 +53,7 @@ parser.add_argument( "--starting_epochs", help="For bookkeeping purposes, what i
 parser.add_argument( "--epoch_checkpoint_frequency", help="How often should we be saving models?", type=int, required=True )
 parser.add_argument( "--num_epochs", help="Number of epochs to run. 0 means infinite loop.", type=int, required=True )
 
-args = parser.parse_args()
-
-exit( 0 )
+#args = parser.parse_args()
 
 #num_neurons_in_first_hidden_layer = args.num_neurons_in_first_hidden_layer
 #print( "num_neurons_in_first_hidden_layer: " + str( num_neurons_in_first_hidden_layer ) )
@@ -67,118 +67,6 @@ def my_assert_equals( name, actual, theoretical ):
         print( name + " is equal to " + actual + " instead of " + theoretical )
         exit( 1 )
 
-def keep_hbond_score( score ):
-    hbond_score = score[ BEST_POSSIBLE_HBOND_SCORE ]
-    print( score )
-    print( hbond_score )
-    exit( 0 )
-    if score == 0:
-        return true
-    if score <= -0.5:
-        return true
-    return false
-
-def calc_weight( nonnative_training_hbond, training_output_hbond ):
-    num_pos = int( 0 )
-    num_neg = int( 0 )
-    for x in nonnative_training_hbond:
-        for i in range( 0, len(x) ):
-            if x[i] != 0:
-                num_pos += 1
-            else:
-                num_neg += 1
-    for x in training_output_hbond:
-        for i in range( 0, len(x) ):
-            if x[i] != 0:
-                num_pos += 1
-            else:
-                num_neg += 1
-
-    return float( num_neg ) / float( num_pos )
-
-def normalize_single_input( input ):
-    input[0] /= 20. #Tx
-    input[1] /= 20. #Ty
-    input[2] /= 20. #Tz
-        
-    input[3] /= 3.14 #Rx
-    input[4] /= 3.14 #Ry
-    input[5] -= 1.6  #Rz
-
-    input[6] -= 1.6 #Theta1
-    input[7] -= 1.6 #Theta2
-    input[8] = (input[8]/15.) - 1 #D
-
-def generate_data_from_file( filename ):
-    dataset = numpy.genfromtxt( filename, delimiter=",", skip_header=0 )
-
-    input = dataset[:,[ TX, TY, TZ, RX, RY, RZ, ANGLE1, ANGLE2, DIST ] ]
-    output_hbond = dataset[:,[ BEST_POSSIBLE_HBOND_SCORE  ] ]
-
-    for x in output_hbond:
-        for i in range( 0, len(x) ):
-            if x[i] > 0:
-                print( "Some hbond value is positive! " + str(x[i]) )
-                exit( 1 )
-            if x[i] != 0:
-                x[i] = 1
-     
-    for x in input:
-        normalize_single_input( x )
-   
-    return input, output_hbond
-
-def evaluate_model( model, best_score_so_far, test_input, test_output_hbond, batch ):
-    num_positives_actual = 0.
-    num_positives_predicted = 0.
-    num_positives_actual_and_predicted = 0.
-
-    num_negatives_actual = 0.
-    num_negatives_predicted = 0.
-    num_negatives_actual_and_predicted = 0.
-        
-    predictions = model.predict( x=test_input );
-
-    for i in range( 0, len(test_input) ):
-
-        actual = test_output_hbond[ i ][ 0 ]
-        prediction = predictions[ i ][ 0 ]
-
-        if actual == 0:
-            num_negatives_actual += 1
-            if prediction < 0.5:
-                num_negatives_predicted += 1
-                num_negatives_actual_and_predicted += 1
-            else:
-                num_positives_predicted += 1
-        else:
-            num_positives_actual += 1
-            if prediction < 0.5:
-                num_negatives_predicted += 1
-            else:
-                num_positives_actual_and_predicted += 1
-                num_positives_predicted += 1
-
-    #min = 1;
-    ppv = num_positives_actual_and_predicted/num_positives_actual
-    npv = num_negatives_actual_and_predicted/num_negatives_actual
-    return ppv, npv
-'''
-    if score1 < min:
-        min = score1
-    if score2 < min:
-        min = score2
-
-    saved = 0
-'''
-    #if min >= best_score_so_far:
-        #best_score_so_far = min
-        #model.save( "best.h5" )
-        #saved = 1
-
-    #print( str(batch) + " " + str(score1) + " " + str(score2) + " " + str(saved) )
-
-    #return best_score_so_far
 
 #https://stackoverflow.com/questions/4601373/better-way-to-shuffle-two-numpy-arrays-in-unison
 def shuffle_in_unison(a, b):
@@ -187,17 +75,35 @@ def shuffle_in_unison(a, b):
     numpy.random.set_state(rng_state)
     numpy.random.shuffle(b)
 
-def score( ppv1, npv1, ppv2, npv2 ):
-    min = 1
-    if( ppv1 < min ):
-        min = ppv1
-    if( npv1 < min ):
-        min = npv1
-    if( ppv2 < min ):
-        min = ppv2
-    if( npv2 < min ):
-        min = npv2
-    return min
+def assert_vecs_line_up( input, output ):
+    #Each line starts with "RESID: XXX,"
+    my_assert_equals( "input file length", len( input ), len( output ) )
+    for i in range( 0, len( input ) ):
+        in_line = input[ i ]
+        in_elem = in_line.split( "," )[ 0 ]
+        in_resid = int( in_elem.split( " " )[ 1 ] )
+        out_line = output[ i ]
+        out_elem = out_line.split( "," )[ 0 ]
+        out_resid = int( out_elem.split( " " )[ 1 ] )
+        my_assert_equals( "out_resid", out_resid, in_resid )
+
+def generate_data_from_files( filenames_csv ):
+    #dataset = numpy.genfromtxt( filename, delimiter=",", skip_header=0 )
+    split = filenames_csv.split( "," );
+    my_assert_equals( "split.length", len( split ), 2 );
+
+    # Both of these elements lead with a dummy
+    input  = pd.read_csv( split[ 0 ] ).values
+    output = pd.read_csv( split[ 1 ] ).values
+
+    print( type( input ) )
+
+    assert_vecs_line_up( input, output )
+   
+    return input, output
+
+generate_data_from_files( "../sample_data/sample.repack.input.csv,../sample_data/sample.repack.output.csv" )
+exit( 0 )
 
 ###########
 # CLASSES #
