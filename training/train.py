@@ -94,7 +94,7 @@ def assert_vecs_line_up( input, output ):
 
 def generate_data_from_files( filenames_csv ):
     #dataset = numpy.genfromtxt( filename, delimiter=",", skip_header=0 )
-    split = filenames_csv.split( "," );
+    split = filenames_csv.split( "\n" )[ 0 ].split( "," );
     my_assert_equals( "split.length", len( split ), 2 );
 
     # Both of these elements lead with a dummy
