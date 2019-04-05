@@ -113,8 +113,8 @@ def generate_data_from_files( filenames_csv ):
 
     return input_no_resid, output_no_resid
 
-generate_data_from_files( "../sample_data/sample.repack.input.csv,../sample_data/sample.repack.output.csv" )
-exit( 0 )
+#generate_data_from_files( "../sample_data/sample.repack.input.csv,../sample_data/sample.repack.output.csv" )
+#exit( 0 )
 
 ###########
 # CLASSES #
