@@ -80,12 +80,9 @@ def assert_vecs_line_up( input, output ):
     my_assert_equals( "input file length", len( input ), len( output ) )
     for i in range( 0, len( input ) ):
         print( input[ i ] )
-        exit( 0 )
-        in_line = input[ i ]
-        in_elem = in_line.split( "," )[ 0 ]
+        in_elem = input[ i ][ 0 ]
         in_resid = int( in_elem.split( " " )[ 1 ] )
-        out_line = output[ i ]
-        out_elem = out_line.split( "," )[ 0 ]
+        out_elem = output[ i ][ 0 ]
         out_resid = int( out_elem.split( " " )[ 1 ] )
         my_assert_equals( "out_resid", out_resid, in_resid )
 
