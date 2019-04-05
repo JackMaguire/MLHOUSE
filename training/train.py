@@ -28,6 +28,13 @@ import subprocess
 # INIT #
 ########
 
+num_input_dimensions = 20021
+num_neurons_in_layer1 = 8000
+num_neurons_in_layer2 = 2000
+num_neurons_in_layer3 = 800
+num_neurons_in_layer4 = 100
+num_output_dimensions = 2
+
 numpy.random.seed( 0 )
 
 #Get sha1
@@ -95,12 +102,14 @@ def generate_data_from_files( filenames_csv ):
     output = pd.read_csv( split[ 1 ] ).values
 
     assert_vecs_line_up( input, output )
-   
-    print( input )
 
-    print( input[:,1:] )
+    input_no_resid = input[:,1:]
+    output_no_resid = output[:,1:]
 
-    return input, output
+    my_assert_equals( "len( input_no_resid[ 0 ] )", len( input_no_resid[ 0 ] ), num_input_dimensions );
+    my_assert_equals( "len( output_no_resid[ 0 ] )", len( output_no_resid[ 0 ] ), num_output_dimensions );
+
+    return input_no_resid, output_no_resid
 
 generate_data_from_files( "../sample_data/sample.repack.input.csv,../sample_data/sample.repack.output.csv" )
 exit( 0 )
