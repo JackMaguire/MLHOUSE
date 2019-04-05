@@ -135,6 +135,8 @@ file = open( args.testing_data, "r" )
 
 for line in file:
     input, output = generate_data_from_files( line )    
+    print( len( input ) )
+
     results = model.evaluate( x=input, y=output )
     print( results )
 
