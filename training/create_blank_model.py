@@ -41,19 +41,22 @@ parser.add_argument( "--model", help="filename for output file", default="blank_
 args = parser.parse_args()
 
 
-num_input_dimensions = 9
+num_input_dimensions = 20021
+num_neurons_in_layer1 = 8000
+num_neurons_in_layer2 = 2000
+num_neurons_in_layer3 = 800
+num_neurons_in_layer4 = 100
+num_output_dimensions = 2
 model = Sequential()
 
-model.add( Dense( num_neurons_in_first_hidden_layer, input_dim=num_input_dimensions, activation='relu') )
-
-for x in range( 0, num_intermediate_hidden_layers ):
-    model.add( Dense( num_neurons_in_intermediate_hidden_layer, activation='relu') )
-
-num_neurons_in_final_layer = int( 2 )
-model.add( Dense( num_neurons_in_final_layer, activation='sigmoid') ) #TODO check this
+model.add( Dense( num_neurons_in_layer1, input_dim=num_input_dimensions, activation='relu') )
+model.add( Dense( num_neurons_in_layer2, activation='relu') )
+model.add( Dense( num_neurons_in_layer3, activation='relu') )
+model.add( Dense( num_neurons_in_layer4, activation='relu') )
+Dense( num_output_dimensions, activation='sigmoid')
 
 # 3) Compile Model
 
 metrics_to_output=[ 'accuracy' ]
-model.compile( loss='binary_crossentropy', optimizer='adam', metrics=metrics_to_output )
+model.compile( loss='mean_squared_error', optimizer='adam', metrics=metrics_to_output )
 model.save( args.model + ".h5" )
