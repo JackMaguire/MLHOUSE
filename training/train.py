@@ -98,9 +98,7 @@ def generate_data_from_files( filenames_csv ):
    
     print( input )
 
-    input.drop( 0 )
-
-    print( input )
+    print( input[:,1:] )
 
     return input, output
 
