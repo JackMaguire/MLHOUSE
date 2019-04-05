@@ -71,7 +71,7 @@ args = parser.parse_args()
 
 def my_assert_equals( name, actual, theoretical ):
     if actual != theoretical:
-        print( name + " is equal to " + actual + " instead of " + theoretical )
+        print( str( name ) + " is equal to " + str( actual ) + " instead of " + str( theoretical ) )
         exit( 1 )
 
 
