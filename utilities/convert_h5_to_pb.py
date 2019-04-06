@@ -48,19 +48,8 @@ sha1 = subprocess.check_output(["git", "--git-dir", full_name, "rev-parse", "HEA
 print ( "JackMaguire/MLHOUSE: " + str( sha1 ) )
 
 parser = argparse.ArgumentParser()
-
 parser.add_argument( "--model", help="Most recent model file", required=True )
 parser.add_argument( "--out", help="Filename for result", required=True )
-
-parser.add_argument( "--evaluate_individually", help="Print predictions vs actual data", type=bool, default=False )
-
-parser.add_argument( "--testing_data", help="CSV where each line has two elements. First element is the absolute path to the input csv file, second element is the absolute path to the corresponding output csv file.", required=True )
-# Example: "--testing_data foo.csv" where foo.csv looks like:
-# /home/jack/input.1.csv,/home/jack/output.1.csv
-# /home/jack/input.2.csv,/home/jack/output.2.csv
-# /home/jack/input.3.csv,/home/jack/output.3.csv
-# ...
-
 args = parser.parse_args()
 
 # https://stackoverflow.com/questions/45466020/how-to-export-keras-h5-to-tensorflow-pb
