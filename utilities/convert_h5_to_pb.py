@@ -25,6 +25,7 @@ import time
 import subprocess
 
 from keras import backend as K
+import tensorflow as tf
 
 ########
 # INIT #
@@ -94,5 +95,6 @@ else:
     exit( 1 )
 
 
+#try tf.keras.backend.get_session() if this fails
 frozen_graph = freeze_session(K.get_session(), output_names=[out.op.name for out in model.outputs])
 tf.train.write_graph(frozen_graph, ".", args.out, as_text=False)
