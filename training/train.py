@@ -188,32 +188,38 @@ for epoch in range( starting_epoch + 1, last_epoch + 1 ):
 
     file = open( args.training_data, "r" )
 
-    for line in file:
-        if prefetcher.isAlive():
-            start_time = time.time()
-            while prefetcher.isAlive():
-                if time.time() - start_time > 600:
-                    print( "Stuck in prefetcher.isAlive() loop!" )
-                    exit( 1 )
+    if args.prefetch:
+        for line in file:
+            if prefetcher.isAlive():
+                start_time = time.time()
+                while prefetcher.isAlive():
+                    if time.time() - start_time > 600:
+                        print( "Stuck in prefetcher.isAlive() loop!" )
+                        exit( 1 )
 
-        if prefetcher.get_state() == 2 :
-            input, output = prefetcher.get_results() #generate_data_from_files( line )
-            prefetcher.set_next_filenames( line )
-            prefetcher.set_state( 0 )
-            prefetcher.start()
+            if prefetcher.get_state() == 2 :
+                input, output = prefetcher.get_results() #generate_data_from_files( line )
+                prefetcher.set_next_filenames( line )
+                prefetcher.set_state( 0 )
+                prefetcher.start()
+                model.train_on_batch( x=input, y=output )
+            else : #this must be the first line
+                prefetcher.set_next_filenames( line )
+                prefetcher.set_state( 0 )
+                prefetcher.start()
+    else:
+        for line in file:
+            input, output = generate_data_from_files( line )
             model.train_on_batch( x=input, y=output )
-        else : #this must be the first line
-            prefetcher.set_next_filenames( line )
-            prefetcher.set_state( 0 )
-            prefetcher.start()
 
     file.close()
     
     #run final batch
-    if prefetcher.get_state() == 2 :
-        input, output = prefetcher.get_results() #generate_data_from_files( line )
-        prefetcher.set_state( 0 )
-        model.train_on_batch( x=input, y=output )
+    if args.prefetch:
+        if prefetcher.get_state() == 2 :
+            input, output = prefetcher.get_results() #generate_data_from_files( line )
+            prefetcher.set_state( 0 )
+            model.train_on_batch( x=input, y=output )
 
     if ( time.time() - time_of_last_save >= save_frequency_in_seconds ):
         time_of_last_save = time.time()
