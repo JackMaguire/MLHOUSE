@@ -57,7 +57,7 @@ parser.add_argument( "--training_data", help="CSV where each line has two elemen
 # ...
 
 parser.add_argument( "--starting_epoch", help="For bookkeeping purposes, what is the epoch number of the model loaded with --model?", type=int, required=True )
-parser.add_argument( "--epoch_checkpoint_frequency", help="How often should we be saving models?", type=int, required=True )
+parser.add_argument( "--epoch_checkpoint_frequency_in_hours", help="How often should we be saving models?", type=int, required=True )
 parser.add_argument( "--num_epochs", help="Number of epochs to run.", type=int, required=True )
 
 args = parser.parse_args()
@@ -148,8 +148,9 @@ else:
 starting_epoch = args.starting_epoch
 last_epoch = starting_epoch + args.num_epochs
 
-save_frequency = args.epoch_checkpoint_frequency
-epochs_until_next_save = args.epoch_checkpoint_frequency
+time_of_last_save = time.time()
+
+save_frequency_in_seconds = args.epoch_checkpoint_frequency_in_hours * 60 * 60
 
 for epoch in range( starting_epoch + 1, last_epoch + 1 ):
 
@@ -161,9 +162,8 @@ for epoch in range( starting_epoch + 1, last_epoch + 1 ):
 
     file.close()
     
-    epochs_until_next_save = epochs_until_next_save - 1
-    if ( epochs_until_next_save == 0 ):
-        epochs_until_next_save = save_frequency
+    if ( time.time() - time_of_last_save >= save_frequency_in_seconds ):
+        time_of_last_save = time.time()
         model.save( "epoch_" + str( epoch ) + ".h5" )
 
 model.save( "final.h5" )
