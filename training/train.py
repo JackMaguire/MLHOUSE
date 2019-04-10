@@ -60,7 +60,7 @@ parser.add_argument( "--starting_epoch", help="For bookkeeping purposes, what is
 parser.add_argument( "--epoch_checkpoint_frequency_in_hours", help="How often should we be saving models?", type=int, required=True )
 parser.add_argument( "--num_epochs", help="Number of epochs to run.", type=int, required=True )
 
-parser.add_argument( "--num_prefetching_threads", help="How many threads should prefetch data", type=int, required=True )
+parser.add_argument( "--prefetch", help="Save time by prefetching data in a different thread", type=bool, required=False, default=True )
 
 
 args = parser.parse_args()
@@ -181,14 +181,34 @@ save_frequency_in_seconds = args.epoch_checkpoint_frequency_in_hours * 60 * 60
 
 for epoch in range( starting_epoch + 1, last_epoch + 1 ):
 
+    prefetcher = PrefetchThread( 0 )
+    prefetcher.set_state( 0 )
+
     file = open( args.training_data, "r" )
 
     for line in file:
-        input, output = generate_data_from_files( line )
-        model.train_on_batch( x=input, y=output )
+        while prefetcher.isAlive() == 1:
+            my_assert_equals( "prefetcher state", prefetcher.get_state(), 1 )
+
+        if prefetcher.get_state() == 2 :
+            input, output = prefetcher.get_results() #generate_data_from_files( line )
+            prefetcher.set_next_filenames( line )
+            prefetcher.set_state( 0 )
+            prefetcher.start()
+            model.train_on_batch( x=input, y=output )
+        else : #this must be the first line
+            prefetcher.set_next_filenames( line )
+            prefetcher.set_state( 0 )
+            prefetcher.start()
 
     file.close()
     
+    #run final batch
+    if prefetcher.get_state() == 2 :
+        input, output = prefetcher.get_results() #generate_data_from_files( line )
+        prefetcher.set_state( 0 )
+        model.train_on_batch( x=input, y=output )
+
     if ( time.time() - time_of_last_save >= save_frequency_in_seconds ):
         time_of_last_save = time.time()
         model.save( "epoch_" + str( epoch ) + ".h5" )
