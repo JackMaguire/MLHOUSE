@@ -190,7 +190,8 @@ for epoch in range( starting_epoch + 1, last_epoch + 1 ):
 
     for line in file:
         while prefetcher.isAlive() == 1:
-            my_assert_equals( "prefetcher state", prefetcher.get_state(), 1 )
+            pass
+            #my_assert_equals( "prefetcher state", prefetcher.get_state(), 1 )
 
         if prefetcher.get_state() == 2 :
             input, output = prefetcher.get_results() #generate_data_from_files( line )
