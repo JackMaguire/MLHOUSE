@@ -136,19 +136,19 @@ class PrefetchThread( threading.Thread ):
         self.next_filenames = ""
         self.state = 0
 
-    def set_next_filenames( setting ):
+    def set_next_filenames( self, setting ):
         self.next_filenames = setting
 
-    def get_results():
+    def get_results( self ):
         return self.input, self.output
 
-    def get_state():
+    def get_state( self ):
         return self.state
 
-    def set_state( setting ):
+    def set_state( self, setting ):
         self.state = setting
 
-    def run(self):
+    def run( self ):
         my_assert_equals( "state", self.state, 0 )
         self.state = 1
         self.input, self.output = generate_data_from_files( self.next_filenames )
