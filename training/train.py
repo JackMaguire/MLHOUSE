@@ -60,6 +60,9 @@ parser.add_argument( "--starting_epoch", help="For bookkeeping purposes, what is
 parser.add_argument( "--epoch_checkpoint_frequency_in_hours", help="How often should we be saving models?", type=int, required=True )
 parser.add_argument( "--num_epochs", help="Number of epochs to run.", type=int, required=True )
 
+parser.add_argument( "--num_prefetching_threads", help="How many threads should prefetch data", type=int, required=True )
+
+
 args = parser.parse_args()
 
 #num_neurons_in_first_hidden_layer = args.num_neurons_in_first_hidden_layer
@@ -119,12 +122,36 @@ def generate_data_from_files( filenames_csv ):
 ###########
 # CLASSES #
 ###########
-class LossHistory(keras.callbacks.Callback):
-    def on_train_begin(self, logs={}):
-        self.losses = []
+#
+# Possible state values:
+# 0: Not yet loaded
+# 1: Running
+# 2: Loaded
+class PrefetchThread( threading.Thread ):
+    def __init__( self, threadID ):
+        threading.Thread.__init__(self)
+        self.threadID = threadID
+        self.next_filenames = ""
+        self.state = 0
 
-    def on_batch_end(self, batch, logs={}):
-        self.losses.append(logs.get('loss'))
+    def set_next_filenames( setting ):
+        self.next_filenames = setting
+
+    def get_results():
+        return self.input, self.output
+
+    def get_state():
+        return self.state
+
+    def set_state( setting ):
+        self.state = setting
+
+    def run(self):
+        my_assert_equals( "state", self.state, 0 )
+        self.state = 1
+        self.input, self.output = generate_data_from_files( self.next_filenames )
+        self.state = 2
+
 
 ###########
 # METRICS #
