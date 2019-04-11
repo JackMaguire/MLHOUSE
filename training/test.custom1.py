@@ -135,7 +135,7 @@ for line in file:
 average_score = deviation_score / count
 average_ddg = deviation_ddg / count
 
-print( str(average_score) + " " + str(average_ddg) )
+print( "RESULTS: " + str(average_score) + " " + str(average_ddg) )
 
 file.close()
 
