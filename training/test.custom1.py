@@ -126,7 +126,7 @@ file = open( args.testing_data, "r" )
 for line in file:
     try:
         input, output = generate_data_from_files( line )    
-    except pandas.errors.EmptyDataError:
+    except pd.errors.EmptyDataError:
         continue
 
     predictions = model.predict( x=input[:] )
