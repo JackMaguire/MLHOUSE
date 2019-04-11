@@ -2,6 +2,8 @@ import os
 #os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
 #os.environ["CUDA_VISIBLE_DEVICES"] = ""
 
+from random import shuffle
+
 #from keras import *
 from keras.models import Sequential
 from keras.layers import Dense
@@ -29,7 +31,7 @@ import subprocess
 # INIT #
 ########
 
-num_input_dimensions = 20021
+num_input_dimensions = 20021 #TODO UPDATE
 num_neurons_in_layer1 = 4000
 num_neurons_in_layer2 = 2000
 num_neurons_in_layer3 = 500
@@ -144,16 +146,17 @@ time_of_last_save = time.time()
 
 save_frequency_in_seconds = args.epoch_checkpoint_frequency_in_hours * 60 * 60
 
+with open( args.training_data, "r" ) as f:
+    file_lines = f.readlines()
+
 for epoch in range( starting_epoch + 1, last_epoch + 1 ):
 
-    file = open( args.training_data, "r" )
+    shuffle( file_lines )
 
-    for line in file:
+    for line in file_lines:
         input, output = generate_data_from_files( line )
         model.train_on_batch( x=input, y=output )
 
-    file.close()
-    
     if ( time.time() - time_of_last_save >= save_frequency_in_seconds ):
         time_of_last_save = time.time()
         model.save( "epoch_" + str( epoch ) + ".h5" )
