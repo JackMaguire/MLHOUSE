@@ -124,7 +124,10 @@ deviation_ddg = 0
 file = open( args.testing_data, "r" )
 
 for line in file:
-    input, output = generate_data_from_files( line )    
+    try:
+        input, output = generate_data_from_files( line )    
+    except pandas.errors.EmptyDataError:
+        continue
 
     predictions = model.predict( x=input[:] )
     for i in range( 0, len( input ) ):
