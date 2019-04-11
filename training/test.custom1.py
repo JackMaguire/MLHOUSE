@@ -127,7 +127,6 @@ for line in file:
     input, output = generate_data_from_files( line )    
 
     predictions = model.predict( x=input[:] )
-    print ( "ActualScore\tPredictedScore\tActualDDG\tPredictedDDG" );
     for i in range( 0, len( input ) ):
         count = count + 1
         deviation_score += abs( output[ i ][ 0 ] - predictions[ i ][ 0 ] )
