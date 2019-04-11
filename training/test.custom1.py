@@ -117,11 +117,11 @@ else:
     exit( 1 )
 
 # 4) Test Model
-file = open( args.testing_data, "r" )
-
 count = 0
 deviation_score = 0
 deviation_ddg = 0
+
+file = open( args.testing_data, "r" )
 
 for line in file:
     input, output = generate_data_from_files( line )    
@@ -132,10 +132,10 @@ for line in file:
         deviation_score += abs( output[ i ][ 0 ] - predictions[ i ][ 0 ] )
         deviation_ddg += abs( output[ i ][ 1 ] - predictions[ i ][ 1 ] )
 
+file.close()
+
 average_score = deviation_score / count
 average_ddg = deviation_ddg / count
 
 print( "RESULTS: " + str(average_score) + " " + str(average_ddg) )
-
-file.close()
 
