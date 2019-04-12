@@ -32,10 +32,10 @@ import subprocess
 ########
 
 num_input_dimensions = 20021 #TODO UPDATE
-num_neurons_in_layer1 = 4000
-num_neurons_in_layer2 = 2000
-num_neurons_in_layer3 = 500
-num_neurons_in_layer4 = 100
+#num_neurons_in_layer1 = 4000
+#num_neurons_in_layer2 = 2000
+#num_neurons_in_layer3 = 500
+#num_neurons_in_layer4 = 100
 num_output_dimensions = 2
 
 numpy.random.seed( 0 )

@@ -42,10 +42,10 @@ args = parser.parse_args()
 
 
 num_input_dimensions = 20021
-num_neurons_in_layer1 = 4000
-num_neurons_in_layer2 = 2000
-num_neurons_in_layer3 = 500
-num_neurons_in_layer4 = 100
+num_neurons_in_layer1 = 1000
+num_neurons_in_layer2 = 250
+num_neurons_in_layer3 = 50
+num_neurons_in_layer4 = 10
 num_output_dimensions = 2
 model = Sequential()
 
