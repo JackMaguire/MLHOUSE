@@ -10,7 +10,7 @@ RUN pip3 install keras
 RUN pip3 install pandas
 
 # For Visualization
-# RUN pip3 install pydot && apt-get install graphviz
+RUN pip3 install pydot && apt-get install graphviz
 
 RUN git clone https://github.com/JackMaguire/MLHOUSE.git
 

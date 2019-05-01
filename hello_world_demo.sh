@@ -19,7 +19,7 @@ echo "testing_input.csv,testing_output.csv"   > testing_data_files.csv || exit 1
 python3 ../training/create_blank_model.py --model starting_model || exit 1
 
 # 2.5. Visualize the model (optional)
-python3 ../utilities/visualize_model.py starting_model.h5 || exit 1
+#python3 ../utilities/visualize_model.py starting_model.h5 || exit 1
 
 # 3. Train the model
 #for this demo, let's just run 10 epochs
