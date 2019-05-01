@@ -4,20 +4,9 @@ import os
 
 from random import shuffle
 
-#from keras import *
-from keras.models import Sequential
-from keras.layers import Dense
-from keras import metrics
-
-from keras.models import load_model
-import keras.backend as K
-import keras.callbacks
-import keras
 import numpy
 
 import sys
-#sys.path.append("/nas/longleaf/home/jackmag")#for h5py
-import h5py
 
 import pandas as pd
 import gzip
@@ -25,8 +14,6 @@ import gzip
 import argparse
 import random
 
-import time
-import subprocess
 
 ########
 # INIT #
@@ -41,17 +28,7 @@ num_output_dimensions = 2
 
 numpy.random.seed( 0 )
 
-#Get sha1
-pwd = os.path.realpath(__file__)
-MLHOUSE_index = pwd.find( "MLHOUSE" )
-path = pwd[:MLHOUSE_index]
-full_name = "~/MLHOUSE/.git".replace( "~", path )
-sha1 = subprocess.check_output(["git", "--git-dir", full_name, "rev-parse", "HEAD"]).strip()
-print ( "JackMaguire/MLHOUSE: " + str( sha1 ) )
-
 parser = argparse.ArgumentParser()
-
-parser.add_argument( "--model", help="Most recent model file", required=True )
 
 parser.add_argument( "--training_data", help="CSV where each line has two elements. First element is the absolute path to the input csv file, second element is the absolute path to the corresponding output csv file.", required=True )
 # Example: "--training_data foo.csv" where foo.csv looks like:
@@ -59,10 +36,6 @@ parser.add_argument( "--training_data", help="CSV where each line has two elemen
 # /home/jack/input.2.csv,/home/jack/output.2.csv
 # /home/jack/input.3.csv,/home/jack/output.3.csv
 # ...
-
-parser.add_argument( "--starting_epoch", help="For bookkeeping purposes, what is the epoch number of the model loaded with --model?", type=int, required=True )
-parser.add_argument( "--epoch_checkpoint_frequency_in_hours", help="How often should we be saving models?", type=int, required=True )
-parser.add_argument( "--num_epochs", help="Number of epochs to run.", type=int, required=True )
 
 args = parser.parse_args()
 
@@ -94,6 +67,7 @@ def assert_vecs_line_up( input, output ):
         in_resid = int( in_elem.split( " " )[ 1 ] )
         out_elem = output[ i ][ 0 ]
         out_resid = int( out_elem.split( " " )[ 1 ] )
+        print( str( in_resid ) + " " + str( out_resid ) )
         my_assert_equals( "out_resid", out_resid, in_resid )
 
 def generate_data_from_files( filenames_csv ):
@@ -162,33 +136,9 @@ def mean_pred( y_true, y_pred ):
 #########
 
 
-if os.path.isfile( args.model ):
-    model = load_model( args.model )
-else:
-    print( "Model " + args.model + " is not a file" )
-    exit( 1 )
-
-# 4) Fit Model
-starting_epoch = args.starting_epoch
-last_epoch = starting_epoch + args.num_epochs
-
-time_of_last_save = time.time()
-
-save_frequency_in_seconds = args.epoch_checkpoint_frequency_in_hours * 60 * 60
-
 with open( args.training_data, "r" ) as f:
     file_lines = f.readlines()
 
-for epoch in range( starting_epoch + 1, last_epoch + 1 ):
-
-    shuffle( file_lines )
-
+for x in range( 0, 1 ):
     for line in file_lines:
         input, output = generate_data_from_files( line )
-        model.train_on_batch( x=input, y=output )
-
-    if ( time.time() - time_of_last_save >= save_frequency_in_seconds ):
-        time_of_last_save = time.time()
-        model.save( "epoch_" + str( epoch ) + ".h5" )
-
-model.save( "final.h5" )
