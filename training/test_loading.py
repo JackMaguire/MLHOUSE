@@ -76,23 +76,37 @@ def generate_data_from_files( filenames_csv ):
     my_assert_equals( "split.length", len( split ), 2 );
 
     # Both of these elements lead with a dummy
-    if split[ 0 ].endswith( ".npy.gz" ):
+    if split[ 0 ].endswith( ".csv.gz" ):
+        f = gzip.GzipFile( split[ 0 ], "r" )
+        input = pd.read_csv( f ).values
+        f.close()
+    elif split[ 0 ].endswith( ".csv" ):
+        input = pd.read_csv( split[ 0 ] ).values
+    elif split[ 0 ].endswith( ".npy.gz" ):
         f = gzip.GzipFile( split[ 0 ], "r" )
         input = numpy.load( f )
         f.close()
     elif split[ 0 ].endswith( ".npy" ):
         input = numpy.load( split[ 0 ] )
     else:
-        input = pd.read_csv( split[ 0 ] ).values
+        print ( "We cannot open this file format: " + split[ 0 ] )
+        exit( 1 )
 
-    if split[ 1 ].endswith( ".npy.gz" ):
+    if split[ 1 ].endswith( ".csv.gz" ):
+        f = gzip.GzipFile( split[ 1 ], "r" )
+        output = pd.read_csv( f ).values
+        f.close()
+    elif split[ 1 ].endswith( ".csv" ):
+        output = pd.read_csv( split[ 1 ] ).values
+    elif split[ 1 ].endswith( ".npy.gz" ):
         f = gzip.GzipFile( split[ 1 ], "r" )
         output = numpy.load( f )
         f.close()
     elif split[ 1 ].endswith( ".npy" ):
         output = numpy.load( split[ 1 ] )
     else:
-        output = pd.read_csv( split[ 1 ] ).values
+        print ( "We cannot open this file format: " + split[ 1 ] )
+        exit( 1 )
 
     assert_vecs_line_up( input, output )
 
