@@ -16,7 +16,7 @@ echo "training_input.csv,training_output.csv" > training_data_files.csv || exit 
 echo "testing_input.csv,testing_output.csv"   > testing_data_files.csv || exit 1
 
 # 2. Create a model
-python3 ../training/create_blank_model.py --model starting_model.h5 || exit 1
+python3 ../training/create_blank_model.py --model starting_model || exit 1
 
 # 2.5. Visualize the model (optional)
 python3 ../utilities/visualize_model.py starting_model.h5 || exit 1
