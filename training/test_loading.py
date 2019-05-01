@@ -67,6 +67,7 @@ def assert_vecs_line_up( input, output ):
         in_resid = int( in_elem.split( " " )[ 1 ] )
         out_elem = output[ i ][ 0 ]
         out_resid = int( out_elem.split( " " )[ 1 ] )
+        print( str( in_resid ) + " " + str( out_resid ) )
         my_assert_equals( "out_resid", out_resid, in_resid )
 
 def generate_data_from_files( filenames_csv ):
