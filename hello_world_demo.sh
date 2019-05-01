@@ -6,11 +6,11 @@ cd demo
 
 # 1. Data Organization
 # We're just using the sample data for now
-head -n 100 ../sample.repack.input.csv  > training_input.csv || exit 1
-head -n 100 ../sample.repack.output.csv > training_output.csv || exit 1
+head -n 100 ../sample_data/sample.repack.input.csv  > training_input.csv || exit 1
+head -n 100 ../sample_data/sample.repack.output.csv > training_output.csv || exit 1
 
-tail -n 50 ../sample.repack.input.csv  > testing_input.csv || exit 1
-tail -n 50 ../sample.repack.output.csv > testing_output.csv || exit 1
+tail -n 50 ../sample_data/sample.repack.input.csv  > testing_input.csv || exit 1
+tail -n 50 ../sample_data/sample.repack.output.csv > testing_output.csv || exit 1
 
 echo "training_input.csv,training_output.csv" > training_data_files.csv || exit 1
 echo "testing_input.csv,testing_output.csv"   > testing_data_files.csv || exit 1
