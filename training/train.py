@@ -25,7 +25,7 @@ import gzip
 import argparse
 import random
 
-import threading
+#import threading
 import time
 import subprocess
 
@@ -68,7 +68,7 @@ parser.add_argument( "--starting_epoch", help="For bookkeeping purposes, what is
 parser.add_argument( "--epoch_checkpoint_frequency_in_hours", help="How often should we be saving models?", type=int, required=True )
 parser.add_argument( "--num_epochs", help="Number of epochs to run.", type=int, required=True )
 
-parser.add_argument( "--nthread", help="Number of threads to use", type=int, required=True )
+#parser.add_argument( "--nthread", help="Number of threads to use", type=int, required=True )
 
 args = parser.parse_args()
 
@@ -152,38 +152,10 @@ def generate_data_from_files( filenames_csv ):
 
     return input_no_resid, output_no_resid
 
-#generate_data_from_files( "../sample_data/sample.repack.input.csv,../sample_data/sample.repack.output.csv" )
-#exit( 0 )
-
-
-###########
-# CLASSES #
-###########
-class DataLoadingThread( threading.Thread ):
-    def __init__( self ):
-        threading.Thread.__init__( self )
-        self.dead = True
-
-    def set_filenames( self, setting ):
-        self.filenames = setting
-        self.dead = False
-
-    def set_dead( self, setting ):
-        self.dead = setting
-
-    def is_dead( self ):
-        return self.dead
-
-    def get_results( self ):
-        return self.input, self.output
-
-    def run( self ):
-        self.input, self.output = generate_data_from_files( self.filenames )
 
 #########
 # START #
 #########
-
 
 if os.path.isfile( args.model ):
     model = load_model( args.model )
@@ -195,7 +167,7 @@ else:
 starting_epoch = args.starting_epoch
 last_epoch = starting_epoch + args.num_epochs
 
-n_threads = args.nthread
+#n_threads = args.nthread
 
 time_of_last_save = time.time()
 
@@ -212,47 +184,6 @@ for epoch in range( starting_epoch + 1, last_epoch + 1 ):
 
     shuffle( file_lines )
 
-    data_loaders = [ DataLoadingThread() for count in xrange( n_threads ) ]
-    print( "created " + str( len( data_loaders ) ) + " data loaders" )
-
-    current_line = 0
-    while True:
-        if current_line >= num_file_lines:
-            break
-
-        t0 = time.time()
-
-        #spawn loads
-        for x in range( 0, n_threads ):
-            index = current_line + x
-            if index < num_file_lines:
-                data_loaders[ x ].set_filenames( file_lines[ index ] )
-                data_loaders[ x ].start()
-            else:
-                data_loaders[ x ].set_dead( True )
-        current_line += n_threads
-
-        t1 = time.time()
-        time_spent_loading += t1 - t0
-
-        #Access loaded data for training
-        for x in range( 0, n_threads ):
-            if data_loaders[ x ].is_dead():
-                continue
-            t0a = time.time()
-            while data_loaders[ x ].isAlive():
-                #wait for this one to finish
-                pass            
-            input, output = data_loaders[ x ].get_results()
-            t1a = time.time()
-            time_spent_loading += t1a - t0a
-
-            t2 = time.time()
-            model.train_on_batch( x=input, y=output )
-            t3 = time.time()
-            time_spent_training += t3 - t2
-
-'''
     for line in file_lines:
         t0 = time.time()
         input, output = generate_data_from_files( line )
@@ -261,7 +192,7 @@ for epoch in range( starting_epoch + 1, last_epoch + 1 ):
         t2 = time.time()
         time_spent_loading += t1 - t0
         time_spent_training += t2 - t1
-'''
+
     if ( time.time() - time_of_last_save >= save_frequency_in_seconds ):
         time_of_last_save = time.time()
         model.save( "epoch_" + str( epoch ) + ".h5" )
