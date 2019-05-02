@@ -37,7 +37,7 @@ sha1 = subprocess.check_output(["git", "--git-dir", full_name, "rev-parse", "HEA
 print ( "JackMaguire/MLHOUSE: " + str( sha1 ) )
 
 parser = argparse.ArgumentParser()
-parser.add_argument( "--model", help="filename for output file", default="blank_model", required=False )
+parser.add_argument( "--model", help="filename for output file", default="rrrrl.1000.500.100.50", required=False )
 args = parser.parse_args()
 
 
