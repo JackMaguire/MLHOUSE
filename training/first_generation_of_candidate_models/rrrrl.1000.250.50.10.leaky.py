@@ -42,7 +42,7 @@ parser.add_argument( "--model", help="filename for output file", default="blank_
 args = parser.parse_args()
 
 
-num_input_dimensions = 20021
+num_input_dimensions = 17809
 num_neurons_in_layer1 = 1000
 num_neurons_in_layer2 = 250
 num_neurons_in_layer3 = 50

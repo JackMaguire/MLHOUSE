@@ -30,7 +30,7 @@ import subprocess
 # INIT #
 ########
 
-num_input_dimensions = 20021
+num_input_dimensions = 17809
 num_neurons_in_layer1 = 4000
 num_neurons_in_layer2 = 2000
 num_neurons_in_layer3 = 500
