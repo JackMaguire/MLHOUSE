@@ -14,8 +14,8 @@ for i in range( 1, len(sys.argv) ):
         contents = pd.read_csv( sys.argv[ i ] ).values
 
     print( contents )
-    numpy.save( sys.argv[ i ] + ".npy", contents )
-    loaded = numpy.load( sys.argv[ i ] + ".npy" )
+    numpy.save( sys.argv[ i ] + ".npy", contents, allow_pickle=True)
+    loaded = numpy.load( sys.argv[ i ] + ".npy", allow_pickle=True )
     if len( contents ) != len( loaded ):
         print ( "len( contents ) != len( loaded )" )
         exit( 1 )

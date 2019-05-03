@@ -102,10 +102,18 @@ def assert_vecs_line_up( input, output ):
         out_resid = int( out_elem.split( " " )[ 1 ] )
         my_assert_equals( "out_resid", out_resid, in_resid )
 
+time_box1 = 0
+time_box2 = 0
+time_box3 = 0
+time_box4 = 0
+time_box5 = 0
+
 def generate_data_from_files( filenames_csv ):
     #dataset = numpy.genfromtxt( filename, delimiter=",", skip_header=0 )
     split = filenames_csv.split( "\n" )[ 0 ].split( "," );
     my_assert_equals( "split.length", len( split ), 2 );
+
+    t0 = time.time()
 
     # Both of these elements lead with a dummy
     if split[ 0 ].endswith( ".csv.gz" ):
@@ -116,13 +124,15 @@ def generate_data_from_files( filenames_csv ):
         input = pd.read_csv( split[ 0 ] ).values
     elif split[ 0 ].endswith( ".npy.gz" ):
         f = gzip.GzipFile( split[ 0 ], "r" )
-        input = numpy.load( f )
+        input = numpy.load( f, allow_pickle=True )
         f.close()
     elif split[ 0 ].endswith( ".npy" ):
-        input = numpy.load( split[ 0 ] )
+        input = numpy.load( split[ 0 ], allow_pickle=True )
     else:
         print ( "We cannot open this file format: " + split[ 0 ] )
         exit( 1 )
+
+    t1 = time.time()
 
     if split[ 1 ].endswith( ".csv.gz" ):
         f = gzip.GzipFile( split[ 1 ], "r" )
@@ -132,18 +142,39 @@ def generate_data_from_files( filenames_csv ):
         output = pd.read_csv( split[ 1 ] ).values
     elif split[ 1 ].endswith( ".npy.gz" ):
         f = gzip.GzipFile( split[ 1 ], "r" )
-        output = numpy.load( f )
+        output = numpy.load( f, allow_pickle=True )
         f.close()
     elif split[ 1 ].endswith( ".npy" ):
-        output = numpy.load( split[ 1 ] )
+        output = numpy.load( split[ 1 ], allow_pickle=True )
     else:
         print ( "We cannot open this file format: " + split[ 1 ] )
         exit( 1 )
 
+    t2 = time.time()
+
     assert_vecs_line_up( input, output )
 
+    t3 = time.time()
+
     input_no_resid = input[:,1:]
+
+    t4 = time.time()
+
     output_no_resid = output[:,1:]
+
+    t5 = time.time()
+
+    global time_box1
+    global time_box2
+    global time_box3
+    global time_box4
+    global time_box5
+
+    time_box1 += t1 - t0
+    time_box2 += t2 - t1
+    time_box3 += t3 - t2
+    time_box4 += t4 - t3
+    time_box5 += t5 - t4
 
     my_assert_equals( "len( input_no_resid[ 0 ] )", len( input_no_resid[ 0 ] ), num_input_dimensions );
     my_assert_equals( "len( output_no_resid[ 0 ] )", len( output_no_resid[ 0 ] ), num_output_dimensions );
@@ -200,5 +231,13 @@ for epoch in range( starting_epoch + 1, last_epoch + 1 ):
 print( str( float( time_spent_loading ) / float(time_spent_loading + time_spent_training) ) + " fraction of time was spent loading" )
 print( time_spent_loading )
 print( time_spent_training )
+
+all_time_boxes = time_box1 + time_box2 + time_box3 + time_box4 + time_box5
+
+print( "time_box1: " + str( time_box1 ) + " " + str( float( time_box1 ) / float( all_time_boxes ) ) )
+print( "time_box2: " + str( time_box2 ) + " " + str( float( time_box2 ) / float( all_time_boxes ) ) )
+print( "time_box3: " + str( time_box3 ) + " " + str( float( time_box3 ) / float( all_time_boxes ) ) )
+print( "time_box4: " + str( time_box4 ) + " " + str( float( time_box4 ) / float( all_time_boxes ) ) )
+print( "time_box5: " + str( time_box5 ) + " " + str( float( time_box5 ) / float( all_time_boxes ) ) )
 
 model.save( "final.h5" )
