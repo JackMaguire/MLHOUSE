@@ -36,11 +36,7 @@ import subprocess
 # INIT #
 ########
 
-num_input_dimensions = 17809 #TODO UPDATE
-#num_neurons_in_layer1 = 4000
-#num_neurons_in_layer2 = 2000
-#num_neurons_in_layer3 = 500
-#num_neurons_in_layer4 = 100
+num_input_dimensions = 9600 #TODO UPDATE
 num_output_dimensions = 2
 
 numpy.random.seed( 0 )
@@ -208,14 +204,17 @@ with open( args.training_data, "r" ) as f:
     file_lines = f.readlines()
 num_file_lines = len( file_lines )
 
-time_spent_loading = 0
-time_spent_training = 0
+time_spent_loading = float( 0 )
+time_spent_training = float( 0 )
+
+next_save_number = int( 1 )
 
 for epoch in range( starting_epoch + 1, last_epoch + 1 ):
 
     shuffle( file_lines )
 
     for line in file_lines:
+        print( "reading " + str( line ) )
         t0 = time.time()
         input, output = generate_data_from_files( line )
         t1 = time.time()
@@ -224,9 +223,12 @@ for epoch in range( starting_epoch + 1, last_epoch + 1 ):
         time_spent_loading += t1 - t0
         time_spent_training += t2 - t1
 
-    if ( time.time() - time_of_last_save >= save_frequency_in_seconds ):
-        time_of_last_save = time.time()
-        model.save( "epoch_" + str( epoch ) + ".h5" )
+        if ( time.time() - time_of_last_save >= save_frequency_in_seconds ):
+            time_of_last_save = time.time()
+            model.save( "save_" + str( next_save_number ) + ".h5" )
+            if next_save_number > 1:
+                os.remove( "save_" + str( next_save_number - 1 ) + ".h5" )
+            next_save_number = next_save_number + 1
 
 print( str( float( time_spent_loading ) / float(time_spent_loading + time_spent_training) ) + " fraction of time was spent loading" )
 print( time_spent_loading )
