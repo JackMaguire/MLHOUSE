@@ -1,6 +1,6 @@
 import os
-os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
-os.environ["CUDA_VISIBLE_DEVICES"] = ""
+#os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
+#os.environ["CUDA_VISIBLE_DEVICES"] = ""
 
 #from keras import *
 from keras.models import Sequential
@@ -184,7 +184,7 @@ file.close()
 average_score = deviation_score / count
 average_ddg = deviation_ddg / count
 average_score_int = deviation_score_int / int_count
-average_ddg_int = deviation_ddg_int / _intcount
+average_ddg_int = deviation_ddg_int / int_count
 
 print( "RESULTS: " + str(average_score) + " " + str(average_ddg) + " " + str(average_score_int) + " " + str(average_ddg_int) )
 
