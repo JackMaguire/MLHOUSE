@@ -155,8 +155,11 @@ else:
 
 # 4) Test Model
 count = 0
+int_count = 0
 deviation_score = 0
+deviation_score_int = 0
 deviation_ddg = 0
+deviation_ddg_int = 0
 
 file = open( args.testing_data, "r" )
 
@@ -172,11 +175,18 @@ for line in file:
         count = count + 1
         deviation_score += abs( output[ i ][ 0 ] - predictions[ i ][ 0 ] )
         deviation_ddg += abs( output[ i ][ 1 ] - predictions[ i ][ 1 ] )
+        if ( output[ i ][ 1 ] < -0.1 ) or ( output[ i ][ 1 ] > 0.1 ):
+            int_count = int_count + 1
+            deviation_score_int += abs( output[ i ][ 0 ] - predictions[ i ][ 0 ] )
+            deviation_ddg_int += abs( output[ i ][ 1 ] - predictions[ i ][ 1 ] )
+
 
 file.close()
 
 average_score = deviation_score / count
 average_ddg = deviation_ddg / count
+average_score_int = deviation_score_int / int_count
+average_ddg_int = deviation_ddg_int / _intcount
 
-print( "RESULTS: " + str(average_score) + " " + str(average_ddg) )
+print( "RESULTS: " + str(average_score) + " " + str(average_ddg) + " " + str(average_score_int) + " " + str(average_ddg_int) )
 
