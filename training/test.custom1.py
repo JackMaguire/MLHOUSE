@@ -1,6 +1,6 @@
 import os
-#os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
-#os.environ["CUDA_VISIBLE_DEVICES"] = ""
+os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
+os.environ["CUDA_VISIBLE_DEVICES"] = ""
 
 #from keras import *
 from keras.models import Sequential
@@ -42,11 +42,7 @@ set_session(sess)  # set this TensorFlow session as the default session for Kera
 # INIT #
 ########
 
-num_input_dimensions = 17809
-num_neurons_in_layer1 = 4000
-num_neurons_in_layer2 = 2000
-num_neurons_in_layer3 = 500
-num_neurons_in_layer4 = 100
+num_input_dimensions = 9600
 num_output_dimensions = 2
 
 numpy.random.seed( 0 )
