@@ -25,6 +25,17 @@ import random
 import time
 import subprocess
 
+import tensorflow as tf
+from keras.backend.tensorflow_backend import set_session
+
+#Only use part of the GPU, from https://github.com/keras-team/keras/issues/4161
+config = tf.ConfigProto()
+config.gpu_options.allow_growth = True  # dynamically grow the memory used on the GPU
+config.log_device_placement = True  # to log device placement (on which device the operation ran)
+                                    # (nothing gets printed in Jupyter, only if you run it standalone)
+sess = tf.Session(config=config)
+set_session(sess)  # set this TensorFlow session as the default session for Keras
+
 ########
 # INIT #
 ########
@@ -153,6 +164,7 @@ for line in file:
     try:
         input, output = generate_data_from_files( line )    
     except pd.errors.EmptyDataError:
+        print( "pd.errors.EmptyDataError" )
         continue
 
     predictions = model.predict( x=input[:] )
