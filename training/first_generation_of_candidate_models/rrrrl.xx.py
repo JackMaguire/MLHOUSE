@@ -37,13 +37,13 @@ sha1 = subprocess.check_output(["git", "--git-dir", full_name, "rev-parse", "HEA
 print ( "JackMaguire/MLHOUSE: " + str( sha1 ) )
 
 parser = argparse.ArgumentParser()
-parser.add_argument( "--model", help="filename for output file", default="blank_model", required=False )
+parser.add_argument( "--model", help="filename for output file", default="rrrrl.xx", required=False )
 args = parser.parse_args()
 
 
-num_input_dimensions = 17809
-num_neurons_in_layer1 = 1000
-num_neurons_in_layer2 = 250
+num_input_dimensions = 9600
+num_neurons_in_layer1 = 1026
+num_neurons_in_layer2 = 342
 num_neurons_in_layer3 = 50
 num_neurons_in_layer4 = 10
 num_output_dimensions = 2

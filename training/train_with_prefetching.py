@@ -2,6 +2,8 @@ import os
 #os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
 #os.environ["CUDA_VISIBLE_DEVICES"] = ""
 
+from random import shuffle
+
 #from keras import *
 from keras.models import Sequential
 from keras.layers import Dense
@@ -18,6 +20,7 @@ import sys
 import h5py
 
 import pandas as pd
+import gzip
 
 import argparse
 import random
@@ -26,15 +29,18 @@ import threading
 import time
 import subprocess
 
+#from tensorflow.python.client import device_lib
+#print(device_lib.list_local_devices())
+
 ########
 # INIT #
 ########
 
-num_input_dimensions = 20021
-num_neurons_in_layer1 = 4000
-num_neurons_in_layer2 = 2000
-num_neurons_in_layer3 = 500
-num_neurons_in_layer4 = 100
+num_input_dimensions = 17809 #TODO UPDATE
+#num_neurons_in_layer1 = 4000
+#num_neurons_in_layer2 = 2000
+#num_neurons_in_layer3 = 500
+#num_neurons_in_layer4 = 100
 num_output_dimensions = 2
 
 numpy.random.seed( 0 )
@@ -62,8 +68,7 @@ parser.add_argument( "--starting_epoch", help="For bookkeeping purposes, what is
 parser.add_argument( "--epoch_checkpoint_frequency_in_hours", help="How often should we be saving models?", type=int, required=True )
 parser.add_argument( "--num_epochs", help="Number of epochs to run.", type=int, required=True )
 
-parser.add_argument( "--prefetch", help="Save time by prefetching data in a different thread", type=bool, required=False, default=True )
-
+parser.add_argument( "--nthread", help="Number of threads to use", type=int, required=True )
 
 args = parser.parse_args()
 
@@ -103,8 +108,37 @@ def generate_data_from_files( filenames_csv ):
     my_assert_equals( "split.length", len( split ), 2 );
 
     # Both of these elements lead with a dummy
-    input  = pd.read_csv( split[ 0 ] ).values
-    output = pd.read_csv( split[ 1 ] ).values
+    if split[ 0 ].endswith( ".csv.gz" ):
+        f = gzip.GzipFile( split[ 0 ], "r" )
+        input = pd.read_csv( f ).values
+        f.close()
+    elif split[ 0 ].endswith( ".csv" ):
+        input = pd.read_csv( split[ 0 ] ).values
+    elif split[ 0 ].endswith( ".npy.gz" ):
+        f = gzip.GzipFile( split[ 0 ], "r" )
+        input = numpy.load( f )
+        f.close()
+    elif split[ 0 ].endswith( ".npy" ):
+        input = numpy.load( split[ 0 ] )
+    else:
+        print ( "We cannot open this file format: " + split[ 0 ] )
+        exit( 1 )
+
+    if split[ 1 ].endswith( ".csv.gz" ):
+        f = gzip.GzipFile( split[ 1 ], "r" )
+        output = pd.read_csv( f ).values
+        f.close()
+    elif split[ 1 ].endswith( ".csv" ):
+        output = pd.read_csv( split[ 1 ] ).values
+    elif split[ 1 ].endswith( ".npy.gz" ):
+        f = gzip.GzipFile( split[ 1 ], "r" )
+        output = numpy.load( f )
+        f.close()
+    elif split[ 1 ].endswith( ".npy" ):
+        output = numpy.load( split[ 1 ] )
+    else:
+        print ( "We cannot open this file format: " + split[ 1 ] )
+        exit( 1 )
 
     assert_vecs_line_up( input, output )
 
@@ -121,46 +155,30 @@ def generate_data_from_files( filenames_csv ):
 #generate_data_from_files( "../sample_data/sample.repack.input.csv,../sample_data/sample.repack.output.csv" )
 #exit( 0 )
 
+
 ###########
 # CLASSES #
 ###########
-#
-# Possible state values:
-# 0: Not yet loaded
-# 1: Running
-# 2: Loaded
-class PrefetchThread( threading.Thread ):
-    def __init__( self, threadID ):
-        threading.Thread.__init__(self)
-        self.threadID = threadID
-        self.next_filenames = ""
-        self.state = 0
+class DataLoadingThread( threading.Thread ):
+    def __init__( self ):
+        threading.Thread.__init__( self )
+        self.dead = True
 
-    def set_next_filenames( self, setting ):
-        self.next_filenames = setting
+    def set_filenames( self, setting ):
+        self.filenames = setting
+        self.dead = False
+
+    def set_dead( self, setting ):
+        self.dead = setting
+
+    def is_dead( self ):
+        return self.dead
 
     def get_results( self ):
         return self.input, self.output
 
-    def get_state( self ):
-        return self.state
-
-    def set_state( self, setting ):
-        self.state = setting
-
     def run( self ):
-        my_assert_equals( "state", self.state, 0 )
-        self.state = 1
-        self.input, self.output = generate_data_from_files( self.next_filenames )
-        self.state = 2
-
-
-###########
-# METRICS #
-###########
-
-def mean_pred( y_true, y_pred ):
-    return K.mean( y_pred )
+        self.input, self.output = generate_data_from_files( self.filenames )
 
 #########
 # START #
@@ -177,52 +195,69 @@ else:
 starting_epoch = args.starting_epoch
 last_epoch = starting_epoch + args.num_epochs
 
+n_threads = args.nthread
+
 time_of_last_save = time.time()
 
 save_frequency_in_seconds = args.epoch_checkpoint_frequency_in_hours * 60 * 60
 
+with open( args.training_data, "r" ) as f:
+    file_lines = f.readlines()
+num_file_lines = len( file_lines )
+
+time_spent_loading = 0
+time_spent_training = 0
+
 for epoch in range( starting_epoch + 1, last_epoch + 1 ):
 
-    prefetcher = PrefetchThread( 0 )
-    prefetcher.set_state( 0 )
+    shuffle( file_lines )
 
-    file = open( args.training_data, "r" )
+    data_loaders = [ DataLoadingThread() for count in range( 0, n_threads ) ]
+    print( "created " + str( len( data_loaders ) ) + " data loaders" )
 
-    if args.prefetch:
-        for line in file:
-            if prefetcher.isAlive():
-                start_time = time.time()
-                while prefetcher.isAlive():
-                    if time.time() - start_time > 600:
-                        print( "Stuck in prefetcher.isAlive() loop!" )
-                        exit( 1 )
+    current_line = 0
+    while True:
+        if current_line >= num_file_lines:
+            break
 
-            if prefetcher.get_state() == 2 :
-                input, output = prefetcher.get_results() #generate_data_from_files( line )
-                prefetcher.set_next_filenames( line )
-                prefetcher.set_state( 0 )
-                prefetcher.start()
-                model.train_on_batch( x=input, y=output )
-            else : #this must be the first line
-                prefetcher.set_next_filenames( line )
-                prefetcher.set_state( 0 )
-                prefetcher.start()
-    else:
-        for line in file:
-            input, output = generate_data_from_files( line )
+        t0 = time.time()
+
+        #spawn loads
+        for x in range( 0, n_threads ):
+            index = current_line + x
+            if index < num_file_lines:
+                data_loaders[ x ].set_filenames( file_lines[ index ] )
+                data_loaders[ x ].start()
+            else:
+                data_loaders[ x ].set_dead( True )
+        current_line += n_threads
+
+        t1 = time.time()
+        time_spent_loading += t1 - t0
+
+        #Access loaded data for training
+        for x in range( 0, n_threads ):
+            if data_loaders[ x ].is_dead():
+                continue
+            t0a = time.time()
+            while data_loaders[ x ].isAlive():
+                #wait for this one to finish
+                pass            
+            input, output = data_loaders[ x ].get_results()
+            t1a = time.time()
+            time_spent_loading += t1a - t0a
+
+            t2 = time.time()
             model.train_on_batch( x=input, y=output )
-
-    file.close()
-    
-    #run final batch
-    if args.prefetch:
-        if prefetcher.get_state() == 2 :
-            input, output = prefetcher.get_results() #generate_data_from_files( line )
-            prefetcher.set_state( 0 )
-            model.train_on_batch( x=input, y=output )
+            t3 = time.time()
+            time_spent_training += t3 - t2
 
     if ( time.time() - time_of_last_save >= save_frequency_in_seconds ):
         time_of_last_save = time.time()
         model.save( "epoch_" + str( epoch ) + ".h5" )
+
+print( str( float( time_spent_loading ) / float(time_spent_loading + time_spent_training) ) + " fraction of time was spent loading" )
+print( time_spent_loading )
+print( time_spent_training )
 
 model.save( "final.h5" )

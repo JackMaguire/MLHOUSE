@@ -2,64 +2,45 @@ import os
 #os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
 #os.environ["CUDA_VISIBLE_DEVICES"] = ""
 
-#from keras import *
-from keras.models import Sequential
-from keras.layers import Dense
-from keras import metrics
+from random import shuffle
 
-from keras.models import load_model
-import keras.backend as K
-import keras.callbacks
-import keras
 import numpy
-import gzip
 
 import sys
-#sys.path.append("/nas/longleaf/home/jackmag")#for h5py
-import h5py
 
 import pandas as pd
+import gzip
 
 import argparse
 import random
-import time
-import subprocess
+
 
 ########
 # INIT #
 ########
 
-num_input_dimensions = 17809
-num_neurons_in_layer1 = 4000
-num_neurons_in_layer2 = 2000
-num_neurons_in_layer3 = 500
-num_neurons_in_layer4 = 100
+num_input_dimensions = 17809 #TODO UPDATE
+#num_neurons_in_layer1 = 4000
+#num_neurons_in_layer2 = 2000
+#num_neurons_in_layer3 = 500
+#num_neurons_in_layer4 = 100
 num_output_dimensions = 2
 
 numpy.random.seed( 0 )
 
-#Get sha1
-pwd = os.path.realpath(__file__)
-MLHOUSE_index = pwd.find( "MLHOUSE" )
-path = pwd[:MLHOUSE_index]
-full_name = "~/MLHOUSE/.git".replace( "~", path )
-sha1 = subprocess.check_output(["git", "--git-dir", full_name, "rev-parse", "HEAD"]).strip()
-print ( "JackMaguire/MLHOUSE: " + str( sha1 ) )
-
 parser = argparse.ArgumentParser()
 
-parser.add_argument( "--model", help="Most recent model file", required=True )
-
-parser.add_argument( "--evaluate_individually", help="Print predictions vs actual data", type=bool, default=False )
-
-parser.add_argument( "--testing_data", help="CSV where each line has two elements. First element is the absolute path to the input csv file, second element is the absolute path to the corresponding output csv file.", required=True )
-# Example: "--testing_data foo.csv" where foo.csv looks like:
+parser.add_argument( "--training_data", help="CSV where each line has two elements. First element is the absolute path to the input csv file, second element is the absolute path to the corresponding output csv file.", required=True )
+# Example: "--training_data foo.csv" where foo.csv looks like:
 # /home/jack/input.1.csv,/home/jack/output.1.csv
 # /home/jack/input.2.csv,/home/jack/output.2.csv
 # /home/jack/input.3.csv,/home/jack/output.3.csv
 # ...
 
 args = parser.parse_args()
+
+#num_neurons_in_first_hidden_layer = args.num_neurons_in_first_hidden_layer
+#print( "num_neurons_in_first_hidden_layer: " + str( num_neurons_in_first_hidden_layer ) )
 
 #########
 # FUNCS #
@@ -71,6 +52,13 @@ def my_assert_equals( name, actual, theoretical ):
         exit( 1 )
 
 
+#https://stackoverflow.com/questions/4601373/better-way-to-shuffle-two-numpy-arrays-in-unison
+def shuffle_in_unison(a, b):
+    rng_state = numpy.random.get_state()
+    numpy.random.shuffle(a)
+    numpy.random.set_state(rng_state)
+    numpy.random.shuffle(b)
+
 def assert_vecs_line_up( input, output ):
     #Each line starts with "RESID: XXX,"
     my_assert_equals( "input file length", len( input ), len( output ) )
@@ -79,6 +67,7 @@ def assert_vecs_line_up( input, output ):
         in_resid = int( in_elem.split( " " )[ 1 ] )
         out_elem = output[ i ][ 0 ]
         out_resid = int( out_elem.split( " " )[ 1 ] )
+        print( str( in_resid ) + " " + str( out_resid ) )
         my_assert_equals( "out_resid", out_resid, in_resid )
 
 def generate_data_from_files( filenames_csv ):
@@ -95,10 +84,10 @@ def generate_data_from_files( filenames_csv ):
         input = pd.read_csv( split[ 0 ] ).values
     elif split[ 0 ].endswith( ".npy.gz" ):
         f = gzip.GzipFile( split[ 0 ], "r" )
-        input = numpy.load( f, allow_pickle=True )
+        input = numpy.load( f )
         f.close()
     elif split[ 0 ].endswith( ".npy" ):
-        input = numpy.load( split[ 0 ], allow_pickle=True )
+        input = numpy.load( split[ 0 ] )
     else:
         print ( "We cannot open this file format: " + split[ 0 ] )
         exit( 1 )
@@ -111,15 +100,16 @@ def generate_data_from_files( filenames_csv ):
         output = pd.read_csv( split[ 1 ] ).values
     elif split[ 1 ].endswith( ".npy.gz" ):
         f = gzip.GzipFile( split[ 1 ], "r" )
-        output = numpy.load( f, allow_pickle=True )
+        output = numpy.load( f )
         f.close()
     elif split[ 1 ].endswith( ".npy" ):
-        output = numpy.load( split[ 1 ], allow_pickle=True )
+        output = numpy.load( split[ 1 ] )
     else:
         print ( "We cannot open this file format: " + split[ 1 ] )
         exit( 1 )
 
     assert_vecs_line_up( input, output )
+
     input_no_resid = input[:,1:]
     output_no_resid = output[:,1:]
 
@@ -133,15 +123,6 @@ def generate_data_from_files( filenames_csv ):
 #generate_data_from_files( "../sample_data/sample.repack.input.csv,../sample_data/sample.repack.output.csv" )
 #exit( 0 )
 
-###########
-# CLASSES #
-###########
-class LossHistory(keras.callbacks.Callback):
-    def on_train_begin(self, logs={}):
-        self.losses = []
-
-    def on_batch_end(self, batch, logs={}):
-        self.losses.append(logs.get('loss'))
 
 ###########
 # METRICS #
@@ -155,31 +136,9 @@ def mean_pred( y_true, y_pred ):
 #########
 
 
-if os.path.isfile( args.model ):
-    model = load_model( args.model )
-else:
-    print( "Model " + args.model + " is not a file" )
-    exit( 1 )
+with open( args.training_data, "r" ) as f:
+    file_lines = f.readlines()
 
-# 4) Test Model
-file = open( args.testing_data, "r" )
-
-print(model.metrics_names)
-
-for line in file:
-    input, output = generate_data_from_files( line )
-
-    #one-by-one output
-    if args.evaluate_individually:
-        predictions = model.predict( x=input[:] )
-        print ( "ActualScore\tPredictedScore\tActualDDG\tPredictedDDG" );
-        for i in range( 0, len( input ) ):
-            print( str( output[ i ][ 0 ] ) + "\t" + str( predictions[ i ][ 0 ] ) + "\t" + str( output[ i ][ 1 ] ) + "\t" + str( predictions[ i ][ 1 ] ) )
-    else:
-        results = model.evaluate( x=input, y=output )
-        print( results )
-
-
-
-file.close()
-
+for x in range( 0, 1 ):
+    for line in file_lines:
+        input, output = generate_data_from_files( line )
