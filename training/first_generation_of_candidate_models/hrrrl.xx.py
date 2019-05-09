@@ -41,7 +41,7 @@ parser.add_argument( "--model", help="filename for output file", default="hrrrl.
 args = parser.parse_args()
 
 
-num_input_dimensions = 960
+num_input_dimensions = 9600
 num_neurons_in_layer1 = 1026
 num_neurons_in_layer2 = 342
 num_neurons_in_layer3 = 50
