@@ -22,6 +22,8 @@ import random
 import time
 import subprocess
 
+import tensorflow as tf
+
 ########
 # INIT #
 ########

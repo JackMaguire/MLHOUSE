@@ -27,6 +27,17 @@ import subprocess
 from keras import backend as K
 import tensorflow as tf
 
+from tensorflow.python.util.tf_export import tf_export
+
+# Tag for the `serving` graph.
+SERVING = "serve"
+tf_export(
+    "saved_model.SERVING",
+    v1=["saved_model.SERVING",
+        "saved_model.tag_constants.SERVING"]).export_constant(
+            __name__, "SERVING")
+
+
 ########
 # INIT #
 ########
@@ -39,6 +50,8 @@ num_neurons_in_layer4 = 100
 num_output_dimensions = 2
 
 numpy.random.seed( 0 )
+
+
 
 #Get sha1
 pwd = os.path.realpath(__file__)
