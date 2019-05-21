@@ -159,13 +159,18 @@ deviation_score_int = 0
 deviation_ddg = 0
 deviation_ddg_int = 0
 
-file = open( args.testing_data, "r" )
+
+file = open( args.testing_data, "r" )    
 
 for line in file:
     try:
         input, output = generate_data_from_files( line )    
     except pd.errors.EmptyDataError:
         print( "pd.errors.EmptyDataError" )
+        continue
+    except OSError as e:
+        print ( e.errno )
+        print ( e )
         continue
 
     predictions = model.predict( x=input[:] )
