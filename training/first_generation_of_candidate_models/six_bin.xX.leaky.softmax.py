@@ -47,7 +47,7 @@ num_neurons_in_layer1 = 1026
 num_neurons_in_layer2 = 342 * 2
 num_neurons_in_layer3 = 50 * 2
 num_neurons_in_layer4 = 10 * 2
-num_output_dimensions = 10
+num_output_dimensions = 12
 model = Sequential()
 
 model.add( Dense( num_neurons_in_layer1, input_dim=num_input_dimensions, activation='relu') )

@@ -43,7 +43,7 @@ set_session(sess)  # set this TensorFlow session as the default session for Kera
 ########
 
 num_input_dimensions = 9600
-num_output_dimensions = 2
+num_output_dimensions = 12
 
 numpy.random.seed( 0 )
 
@@ -68,6 +68,9 @@ parser.add_argument( "--testing_data", help="CSV where each line has two element
 # /home/jack/input.3.csv,/home/jack/output.3.csv
 # ...
 
+parser.add_argument( "--six_bin", help="Apply six bin transformation to output", type=bool, required=True )
+
+
 args = parser.parse_args()
 
 #########
@@ -90,10 +93,12 @@ def assert_vecs_line_up( input, output ):
         out_resid = int( out_elem.split( " " )[ 1 ] )
         my_assert_equals( "out_resid", out_resid, in_resid )
 
-def generate_data_from_files( filenames_csv ):
+def generate_data_from_files( filenames_csv, six_bin ):
     #dataset = numpy.genfromtxt( filename, delimiter=",", skip_header=0 )
     split = filenames_csv.split( "\n" )[ 0 ].split( "," );
     my_assert_equals( "split.length", len( split ), 2 );
+
+    t0 = time.time()
 
     # Both of these elements lead with a dummy
     if split[ 0 ].endswith( ".csv.gz" ):
@@ -129,15 +134,37 @@ def generate_data_from_files( filenames_csv ):
         exit( 1 )
 
     assert_vecs_line_up( input, output )
+
     input_no_resid = input[:,1:]
+
     output_no_resid = output[:,1:]
 
     my_assert_equals( "len( input_no_resid[ 0 ] )", len( input_no_resid[ 0 ] ), num_input_dimensions );
-    my_assert_equals( "len( output_no_resid[ 0 ] )", len( output_no_resid[ 0 ] ), num_output_dimensions );
 
     #https://www.kaggle.com/vishwasgpai/guide-for-creating-cnn-model-using-csv-file
 
-    return input_no_resid, output_no_resid
+    if six_bin:
+        six_bin_output_no_resid = output_no_resid.copy()
+        new_shape = ( output_no_resid.shape[ 0 ], num_output_dimensions )
+        six_bin_output_no_resid.resize( new_shape )
+        for x in range( 0, len( output_no_resid ) ):
+            my_assert_equals( "len(six_bin_output_no_resid[ x ])", len( six_bin_output_no_resid[ x ] ), num_output_dimensions )
+            six_bin_output_no_resid[ x ][ 0 ] = 1 if output_no_resid[ x ][ 0 ] <= -5.0 else 0
+            six_bin_output_no_resid[ x ][ 1 ] = 1 if output_no_resid[ x ][ 0 ] <= -3.0 else 0
+            six_bin_output_no_resid[ x ][ 2 ] = 1 if output_no_resid[ x ][ 0 ] <= -1.0 else 0
+            six_bin_output_no_resid[ x ][ 3 ] = 1 if output_no_resid[ x ][ 0 ] >= 1.0 else 0
+            six_bin_output_no_resid[ x ][ 4 ] = 1 if output_no_resid[ x ][ 0 ] >= 3.0 else 0
+            six_bin_output_no_resid[ x ][ 5 ] = 1 if output_no_resid[ x ][ 0 ] >= 5.0 else 0
+            six_bin_output_no_resid[ x ][ 6 ] = 1 if output_no_resid[ x ][ 1 ] <= -5.0 else 0
+            six_bin_output_no_resid[ x ][ 7 ] = 1 if output_no_resid[ x ][ 1 ] <= -3.0 else 0
+            six_bin_output_no_resid[ x ][ 8 ] = 1 if output_no_resid[ x ][ 1 ] <= -1.0 else 0
+            six_bin_output_no_resid[ x ][ 9 ] = 1 if output_no_resid[ x ][ 1 ] >= 1.0 else 0
+            six_bin_output_no_resid[ x ][ 10] = 1 if output_no_resid[ x ][ 1 ] >= 3.0 else 0
+            six_bin_output_no_resid[ x ][ 11] = 1 if output_no_resid[ x ][ 1 ] >= 5.0 else 0
+        return input_no_resid, six_bin_output_no_resid
+    else:
+        my_assert_equals( "len( output_no_resid[ 0 ] )", len( output_no_resid[ 0 ] ), num_output_dimensions );
+        return input_no_resid, output_no_resid
 
 
 #########
@@ -160,11 +187,11 @@ deviation_ddg = 0
 deviation_ddg_int = 0
 
 
-file = open( args.testing_data, "r" )    
+file = open( args.testing_data, "r" )
 
 for line in file:
     try:
-        input, output = generate_data_from_files( line )    
+        input, output = generate_data_from_files( line, args.six_bin )
     except pd.errors.EmptyDataError:
         print( "pd.errors.EmptyDataError" )
         continue
@@ -194,4 +221,3 @@ average_score_int = deviation_score_int / int_count
 average_ddg_int = deviation_ddg_int / int_count
 
 print( "RESULTS: " + str(average_score) + " " + str(average_ddg) + " " + str(average_score_int) + " " + str(average_ddg_int) + " " + str(count) + " " + str(int_count) )
-

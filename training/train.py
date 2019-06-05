@@ -50,8 +50,8 @@ set_session(sess)  # set this TensorFlow session as the default session for Kera
 # INIT #
 ########
 
-num_input_dimensions = 9600 #TODO UPDATE
-num_output_dimensions = 2
+num_input_dimensions = 9600
+num_output_dimensions = 12
 
 numpy.random.seed( 0 )
 
@@ -78,12 +78,9 @@ parser.add_argument( "--starting_epoch", help="For bookkeeping purposes, what is
 parser.add_argument( "--epoch_checkpoint_frequency_in_hours", help="How often should we be saving models?", type=int, required=True )
 parser.add_argument( "--num_epochs", help="Number of epochs to run.", type=int, required=True )
 
-#parser.add_argument( "--nthread", help="Number of threads to use", type=int, required=True )
+parser.add_argument( "--six_bin", help="Apply six bin transformation to output", type=bool, required=True )
 
 args = parser.parse_args()
-
-#num_neurons_in_first_hidden_layer = args.num_neurons_in_first_hidden_layer
-#print( "num_neurons_in_first_hidden_layer: " + str( num_neurons_in_first_hidden_layer ) )
 
 #########
 # FUNCS #
@@ -112,13 +109,7 @@ def assert_vecs_line_up( input, output ):
         out_resid = int( out_elem.split( " " )[ 1 ] )
         my_assert_equals( "out_resid", out_resid, in_resid )
 
-time_box1 = 0
-time_box2 = 0
-time_box3 = 0
-time_box4 = 0
-time_box5 = 0
-
-def generate_data_from_files( filenames_csv ):
+def generate_data_from_files( filenames_csv, six_bin ):
     #dataset = numpy.genfromtxt( filename, delimiter=",", skip_header=0 )
     split = filenames_csv.split( "\n" )[ 0 ].split( "," );
     my_assert_equals( "split.length", len( split ), 2 );
@@ -142,8 +133,6 @@ def generate_data_from_files( filenames_csv ):
         print ( "We cannot open this file format: " + split[ 0 ] )
         exit( 1 )
 
-    t1 = time.time()
-
     if split[ 1 ].endswith( ".csv.gz" ):
         f = gzip.GzipFile( split[ 1 ], "r" )
         output = pd.read_csv( f ).values
@@ -160,38 +149,38 @@ def generate_data_from_files( filenames_csv ):
         print ( "We cannot open this file format: " + split[ 1 ] )
         exit( 1 )
 
-    t2 = time.time()
-
     assert_vecs_line_up( input, output )
-
-    t3 = time.time()
 
     input_no_resid = input[:,1:]
 
-    t4 = time.time()
-
     output_no_resid = output[:,1:]
 
-    t5 = time.time()
-
-    global time_box1
-    global time_box2
-    global time_box3
-    global time_box4
-    global time_box5
-
-    time_box1 += t1 - t0
-    time_box2 += t2 - t1
-    time_box3 += t3 - t2
-    time_box4 += t4 - t3
-    time_box5 += t5 - t4
-
     my_assert_equals( "len( input_no_resid[ 0 ] )", len( input_no_resid[ 0 ] ), num_input_dimensions );
-    my_assert_equals( "len( output_no_resid[ 0 ] )", len( output_no_resid[ 0 ] ), num_output_dimensions );
 
     #https://www.kaggle.com/vishwasgpai/guide-for-creating-cnn-model-using-csv-file
 
-    return input_no_resid, output_no_resid
+    if six_bin:
+        six_bin_output_no_resid = output_no_resid.copy()
+        new_shape = ( output_no_resid.shape[ 0 ], num_output_dimensions )
+        six_bin_output_no_resid.resize( new_shape )
+        for x in range( 0, len( output_no_resid ) ):
+            my_assert_equals( "len(six_bin_output_no_resid[ x ])", len( six_bin_output_no_resid[ x ] ), num_output_dimensions )
+            six_bin_output_no_resid[ x ][ 0 ] = 1 if output_no_resid[ x ][ 0 ] <= -5.0 else 0
+            six_bin_output_no_resid[ x ][ 1 ] = 1 if output_no_resid[ x ][ 0 ] <= -3.0 else 0
+            six_bin_output_no_resid[ x ][ 2 ] = 1 if output_no_resid[ x ][ 0 ] <= -1.0 else 0
+            six_bin_output_no_resid[ x ][ 3 ] = 1 if output_no_resid[ x ][ 0 ] >= 1.0 else 0
+            six_bin_output_no_resid[ x ][ 4 ] = 1 if output_no_resid[ x ][ 0 ] >= 3.0 else 0
+            six_bin_output_no_resid[ x ][ 5 ] = 1 if output_no_resid[ x ][ 0 ] >= 5.0 else 0
+            six_bin_output_no_resid[ x ][ 6 ] = 1 if output_no_resid[ x ][ 1 ] <= -5.0 else 0
+            six_bin_output_no_resid[ x ][ 7 ] = 1 if output_no_resid[ x ][ 1 ] <= -3.0 else 0
+            six_bin_output_no_resid[ x ][ 8 ] = 1 if output_no_resid[ x ][ 1 ] <= -1.0 else 0
+            six_bin_output_no_resid[ x ][ 9 ] = 1 if output_no_resid[ x ][ 1 ] >= 1.0 else 0
+            six_bin_output_no_resid[ x ][ 10] = 1 if output_no_resid[ x ][ 1 ] >= 3.0 else 0
+            six_bin_output_no_resid[ x ][ 11] = 1 if output_no_resid[ x ][ 1 ] >= 5.0 else 0
+        return input_no_resid, six_bin_output_no_resid
+    else:
+        my_assert_equals( "len( output_no_resid[ 0 ] )", len( output_no_resid[ 0 ] ), num_output_dimensions );
+        return input_no_resid, output_no_resid
 
 
 #########
@@ -230,7 +219,7 @@ for epoch in range( starting_epoch + 1, last_epoch + 1 ):
     for line in file_lines:
         print( "reading " + str( line ) )
         t0 = time.time()
-        input, output = generate_data_from_files( line )
+        input, output = generate_data_from_files( line, args.six_bin )
         t1 = time.time()
         model.train_on_batch( x=input, y=output )
         t2 = time.time()
@@ -247,13 +236,5 @@ for epoch in range( starting_epoch + 1, last_epoch + 1 ):
 print( str( float( time_spent_loading ) / float(time_spent_loading + time_spent_training) ) + " fraction of time was spent loading" )
 print( time_spent_loading )
 print( time_spent_training )
-
-all_time_boxes = time_box1 + time_box2 + time_box3 + time_box4 + time_box5
-
-print( "time_box1: " + str( time_box1 ) + " " + str( float( time_box1 ) / float( all_time_boxes ) ) )
-print( "time_box2: " + str( time_box2 ) + " " + str( float( time_box2 ) / float( all_time_boxes ) ) )
-print( "time_box3: " + str( time_box3 ) + " " + str( float( time_box3 ) / float( all_time_boxes ) ) )
-print( "time_box4: " + str( time_box4 ) + " " + str( float( time_box4 ) / float( all_time_boxes ) ) )
-print( "time_box5: " + str( time_box5 ) + " " + str( float( time_box5 ) / float( all_time_boxes ) ) )
 
 model.save( "final.h5" )
