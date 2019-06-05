@@ -1,6 +1,6 @@
 #!/bin/bash
 
-for prefix in rrrrl.xx rrrrl.xx.leaky trrrl.xx hrrrl.xx; do
+for prefix in rrrrl.Xx.leaky rrrrl.xX.leaky rrrrl.XX.leaky rrrrl.a.leaky rrrrl.b.leaky rrrrl.c.leaky rrrrl.d.leaky rrrrl.e.leaky; do
     next_model=$prefix.h5
     for x in 0 1 2 3 4 5 6 7; do
 	if [ -f $prefix.trainingset3.epoch1.subrange$x.h5 ]; then

@@ -176,6 +176,8 @@ for line in file:
     predictions = model.predict( x=input[:] )
     for i in range( 0, len( input ) ):
         count = count + 1
+        if output[ i ][ 0 ] > -2.0 or output[ i ][ 0 ] < -5.0:
+            continue
         deviation_score += abs( output[ i ][ 0 ] - predictions[ i ][ 0 ] )
         deviation_ddg += abs( output[ i ][ 1 ] - predictions[ i ][ 1 ] )
         if ( output[ i ][ 1 ] < -0.1 ) or ( output[ i ][ 1 ] > 0.1 ):
