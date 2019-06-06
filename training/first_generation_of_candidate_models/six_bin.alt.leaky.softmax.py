@@ -15,7 +15,6 @@ import keras
 import numpy
 
 import sys
-#sys.path.append("/nas/longleaf/home/jackmag")#for h5py
 import h5py
 
 import argparse
@@ -43,20 +42,14 @@ args = parser.parse_args()
 
 
 num_input_dimensions = 9600
-num_neurons_in_layer1 = 1026
-num_neurons_in_layer2 = 342 * 2
-num_neurons_in_layer3 = 50 * 2
-num_neurons_in_layer4 = 10 * 2
+num_neurons_in_layer1 = 1500
+num_neurons_in_layer2 = 500
 num_output_dimensions = 12
 model = Sequential()
 
 model.add( Dense( num_neurons_in_layer1, input_dim=num_input_dimensions, activation='relu') )
 model.add( LeakyReLU(alpha=.01) )
 model.add( Dense( num_neurons_in_layer2, activation='relu') )
-model.add( LeakyReLU(alpha=.01) )
-model.add( Dense( num_neurons_in_layer3, activation='relu') )
-model.add( LeakyReLU(alpha=.01) )
-model.add( Dense( num_neurons_in_layer4, activation='relu') )
 model.add( LeakyReLU(alpha=.01) )
 model.add( Dense( num_output_dimensions, activation='softmax') )
 

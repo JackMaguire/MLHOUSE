@@ -1,4 +1,4 @@
-import os
+]import os
 os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
 os.environ["CUDA_VISIBLE_DEVICES"] = ""
 
@@ -93,7 +93,7 @@ def assert_vecs_line_up( input, output ):
         out_resid = int( out_elem.split( " " )[ 1 ] )
         my_assert_equals( "out_resid", out_resid, in_resid )
 
-def generate_data_from_files( filenames_csv, six_bin ):
+def generate_data_from_files( filenames_csv ):
     #dataset = numpy.genfromtxt( filename, delimiter=",", skip_header=0 )
     split = filenames_csv.split( "\n" )[ 0 ].split( "," );
     my_assert_equals( "split.length", len( split ), 2 );
@@ -143,28 +143,8 @@ def generate_data_from_files( filenames_csv, six_bin ):
 
     #https://www.kaggle.com/vishwasgpai/guide-for-creating-cnn-model-using-csv-file
 
-    if six_bin:
-        six_bin_output_no_resid = output_no_resid.copy()
-        new_shape = ( output_no_resid.shape[ 0 ], num_output_dimensions )
-        six_bin_output_no_resid.resize( new_shape )
-        for x in range( 0, len( output_no_resid ) ):
-            my_assert_equals( "len(six_bin_output_no_resid[ x ])", len( six_bin_output_no_resid[ x ] ), num_output_dimensions )
-            six_bin_output_no_resid[ x ][ 0 ] = 1 if output_no_resid[ x ][ 0 ] <= -5.0 else 0
-            six_bin_output_no_resid[ x ][ 1 ] = 1 if output_no_resid[ x ][ 0 ] <= -3.0 else 0
-            six_bin_output_no_resid[ x ][ 2 ] = 1 if output_no_resid[ x ][ 0 ] <= -1.0 else 0
-            six_bin_output_no_resid[ x ][ 3 ] = 1 if output_no_resid[ x ][ 0 ] >= 1.0 else 0
-            six_bin_output_no_resid[ x ][ 4 ] = 1 if output_no_resid[ x ][ 0 ] >= 3.0 else 0
-            six_bin_output_no_resid[ x ][ 5 ] = 1 if output_no_resid[ x ][ 0 ] >= 5.0 else 0
-            six_bin_output_no_resid[ x ][ 6 ] = 1 if output_no_resid[ x ][ 1 ] <= -5.0 else 0
-            six_bin_output_no_resid[ x ][ 7 ] = 1 if output_no_resid[ x ][ 1 ] <= -3.0 else 0
-            six_bin_output_no_resid[ x ][ 8 ] = 1 if output_no_resid[ x ][ 1 ] <= -1.0 else 0
-            six_bin_output_no_resid[ x ][ 9 ] = 1 if output_no_resid[ x ][ 1 ] >= 1.0 else 0
-            six_bin_output_no_resid[ x ][ 10] = 1 if output_no_resid[ x ][ 1 ] >= 3.0 else 0
-            six_bin_output_no_resid[ x ][ 11] = 1 if output_no_resid[ x ][ 1 ] >= 5.0 else 0
-        return input_no_resid, six_bin_output_no_resid
-    else:
-        my_assert_equals( "len( output_no_resid[ 0 ] )", len( output_no_resid[ 0 ] ), num_output_dimensions );
-        return input_no_resid, output_no_resid
+    my_assert_equals( "len( output_no_resid[ 0 ] )", len( output_no_resid[ 0 ] ), num_output_dimensions );
+    return input_no_resid, output_no_resid
 
 
 #########
@@ -191,7 +171,7 @@ file = open( args.testing_data, "r" )
 
 for line in file:
     try:
-        input, output = generate_data_from_files( line, args.six_bin )
+        input, output = generate_data_from_files( line )
     except pd.errors.EmptyDataError:
         print( "pd.errors.EmptyDataError" )
         continue
@@ -203,14 +183,22 @@ for line in file:
     predictions = model.predict( x=input[:] )
     for i in range( 0, len( input ) ):
         count = count + 1
-        if output[ i ][ 0 ] > -2.0 or output[ i ][ 0 ] < -5.0:
+        if output[ i ][ 0 ] > 6.0 or output[ i ][ 0 ] < -6.0:
             continue
-        deviation_score += abs( output[ i ][ 0 ] - predictions[ i ][ 0 ] )
-        deviation_ddg += abs( output[ i ][ 1 ] - predictions[ i ][ 1 ] )
+
+        if args.six_bin:
+            predicted_score = -2.0*( predictions[ i ][ 0 ] + predictions[ i ][ 1 ] + predictions[ i ][ 2 ] ) + 2.0 * ( predictions[ i ][ 3 ] + predictions[ i ][ 4 ] + predictions[ i ][ 5 ] )
+            predicted_ddg = -2.0*( predictions[ i ][ 6 ] + predictions[ i ][ 7 ] + predictions[ i ][ 8 ] ) + 2.0 * ( predictions[ i ][ 9 ] + predictions[ i ][ 10 ] + predictions[ i ][ 11 ] )
+        else:
+            predicted_score = predictions[ i ][ 0 ]
+            predicted_ddg = predictions[ i ][ 1 ]
+
+        deviation_score += abs( output[ i ][ 0 ] - predicted_score )
+        deviation_ddg += abs( output[ i ][ 1 ] - predicted_ddg )
         if ( output[ i ][ 1 ] < -0.1 ) or ( output[ i ][ 1 ] > 0.1 ):
             int_count = int_count + 1
-            deviation_score_int += abs( output[ i ][ 0 ] - predictions[ i ][ 0 ] )
-            deviation_ddg_int += abs( output[ i ][ 1 ] - predictions[ i ][ 1 ] )
+            deviation_score_int += abs( output[ i ][ 0 ] - predicted_score )
+            deviation_ddg_int += abs( output[ i ][ 1 ] - predicted_ddg )
 
 
 file.close()
