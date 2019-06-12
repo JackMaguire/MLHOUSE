@@ -15,7 +15,6 @@ import keras
 import numpy
 
 import sys
-#sys.path.append("/nas/longleaf/home/jackmag")#for h5py
 import h5py
 
 import argparse
@@ -38,30 +37,38 @@ sha1 = subprocess.check_output(["git", "--git-dir", full_name, "rev-parse", "HEA
 print ( "JackMaguire/MLHOUSE: " + str( sha1 ) )
 
 parser = argparse.ArgumentParser()
-parser.add_argument( "--model", help="filename for output file", default="six_bin.xX.leaky.sigmoid", required=False )
+parser.add_argument( "--model", help="filename for output file", default="six_bin.alt.leaky.softsign.hackyCrossEntropyLoss", required=False )
 args = parser.parse_args()
 
 
 num_input_dimensions = 9600
-num_neurons_in_layer1 = 1026
-num_neurons_in_layer2 = 342 * 2
-num_neurons_in_layer3 = 50 * 2
-num_neurons_in_layer4 = 10 * 2
+num_neurons_in_layer1 = 1500
+num_neurons_in_layer2 = 500
 num_output_dimensions = 12
 model = Sequential()
 
-model.add( Dense( num_neurons_in_layer1, input_dim=num_input_dimensions, activation='relu') )
+model.add( Dense( num_neurons_in_layer1, input_dim=num_input_dimensions ) )
 model.add( LeakyReLU(alpha=.01) )
-model.add( Dense( num_neurons_in_layer2, activation='relu') )
+model.add( Dense( num_neurons_in_layer2 ) )
 model.add( LeakyReLU(alpha=.01) )
-model.add( Dense( num_neurons_in_layer3, activation='relu') )
-model.add( LeakyReLU(alpha=.01) )
-model.add( Dense( num_neurons_in_layer4, activation='relu') )
-model.add( LeakyReLU(alpha=.01) )
-model.add( Dense( num_output_dimensions, activation='sigmoid') )
+model.add( Dense( num_output_dimensions, activation='softsign') )
 
-# 3) Compile Model
+#https://towardsdatascience.com/advanced-keras-constructing-complex-custom-losses-and-metrics-c07ca130a618
+def custom_loss():
+    def loss( y_true, y_pred ):
+        #using notation from https://ml-cheatsheet.readthedocs.io/en/latest/loss_functions.html where
+        #p: predicted probability ( 0 to 1 )
+        #y: actual probability ( 0 to 1 )
+        #y_pred: predicted probability (-1 to 1)
+        p=(y_pred + 1)/2
+        if y_true == 1:
+            return -1*K.log( p )
+        else: # y_true == 0
+            return -1*K.log( 1 - p )
+
+    return loss
+
 
 metrics_to_output=[ 'accuracy' ]
-model.compile( loss='mean_absolute_error', optimizer='adam', metrics=metrics_to_output )
+model.compile( loss=custom_loss(), optimizer='adam', metrics=metrics_to_output )
 model.save( args.model + ".h5" )

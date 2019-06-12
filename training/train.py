@@ -165,18 +165,18 @@ def generate_data_from_files( filenames_csv, six_bin ):
         six_bin_output_no_resid.resize( new_shape )
         for x in range( 0, len( output_no_resid ) ):
             my_assert_equals( "len(six_bin_output_no_resid[ x ])", len( six_bin_output_no_resid[ x ] ), num_output_dimensions )
-            six_bin_output_no_resid[ x ][ 0 ] = 1 if output_no_resid[ x ][ 0 ] <= -5.0 else 0
-            six_bin_output_no_resid[ x ][ 1 ] = 1 if output_no_resid[ x ][ 0 ] <= -3.0 else 0
-            six_bin_output_no_resid[ x ][ 2 ] = 1 if output_no_resid[ x ][ 0 ] <= -1.0 else 0
-            six_bin_output_no_resid[ x ][ 3 ] = 1 if output_no_resid[ x ][ 0 ] >= 1.0 else 0
-            six_bin_output_no_resid[ x ][ 4 ] = 1 if output_no_resid[ x ][ 0 ] >= 3.0 else 0
-            six_bin_output_no_resid[ x ][ 5 ] = 1 if output_no_resid[ x ][ 0 ] >= 5.0 else 0
-            six_bin_output_no_resid[ x ][ 6 ] = 1 if output_no_resid[ x ][ 1 ] <= -5.0 else 0
-            six_bin_output_no_resid[ x ][ 7 ] = 1 if output_no_resid[ x ][ 1 ] <= -3.0 else 0
-            six_bin_output_no_resid[ x ][ 8 ] = 1 if output_no_resid[ x ][ 1 ] <= -1.0 else 0
-            six_bin_output_no_resid[ x ][ 9 ] = 1 if output_no_resid[ x ][ 1 ] >= 1.0 else 0
-            six_bin_output_no_resid[ x ][ 10] = 1 if output_no_resid[ x ][ 1 ] >= 3.0 else 0
-            six_bin_output_no_resid[ x ][ 11] = 1 if output_no_resid[ x ][ 1 ] >= 5.0 else 0
+            six_bin_output_no_resid[ x ][ 0 ] = 1.0 if output_no_resid[ x ][ 0 ] <= -5.0 else -1.0
+            six_bin_output_no_resid[ x ][ 1 ] = 1.0 if output_no_resid[ x ][ 0 ] <= -3.0 else -1.0
+            six_bin_output_no_resid[ x ][ 2 ] = 1.0 if output_no_resid[ x ][ 0 ] <= -1.0 else -1.0
+            six_bin_output_no_resid[ x ][ 3 ] = 1.0 if output_no_resid[ x ][ 0 ] >= 1.0 else -1.0
+            six_bin_output_no_resid[ x ][ 4 ] = 1.0 if output_no_resid[ x ][ 0 ] >= 3.0 else -1.0
+            six_bin_output_no_resid[ x ][ 5 ] = 1.0 if output_no_resid[ x ][ 0 ] >= 5.0 else -1.0
+            six_bin_output_no_resid[ x ][ 6 ] = 1.0 if output_no_resid[ x ][ 1 ] <= -2.5 else -1.0
+            six_bin_output_no_resid[ x ][ 7 ] = 1.0 if output_no_resid[ x ][ 1 ] <= -1.5 else -1.0
+            six_bin_output_no_resid[ x ][ 8 ] = 1.0 if output_no_resid[ x ][ 1 ] <= -0.5 else -1.0
+            six_bin_output_no_resid[ x ][ 9 ] = 1.0 if output_no_resid[ x ][ 1 ] >= 0.5 else -1.0
+            six_bin_output_no_resid[ x ][ 10] = 1.0 if output_no_resid[ x ][ 1 ] >= 1.5 else -1.0
+            six_bin_output_no_resid[ x ][ 11] = 1.0 if output_no_resid[ x ][ 1 ] >= 2.0 else -1.0
         return input_no_resid, six_bin_output_no_resid
     else:
         my_assert_equals( "len( output_no_resid[ 0 ] )", len( output_no_resid[ 0 ] ), num_output_dimensions );
