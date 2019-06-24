@@ -2,15 +2,15 @@ import os
 os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
 os.environ["CUDA_VISIBLE_DEVICES"] = ""
 
-#from keras import *
-from keras.models import Sequential
-from keras.layers import Dense
-from keras import metrics
+#from tensorflow.keras import *
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense
+from tensorflow.keras import metrics
 
-from keras.models import load_model
-import keras.backend as K
-import keras.callbacks
-import keras
+from tensorflow.keras.models import load_model
+import tensorflow.keras.backend as K
+import tensorflow.keras.callbacks
+import tensorflow.keras
 import numpy
 
 import sys
@@ -56,15 +56,6 @@ model.add( Dense( num_output_dimensions, activation='linear') )
 metrics_to_output=[ 'accuracy' ]
 model.compile( loss='mean_squared_error', optimizer='adam', metrics=metrics_to_output )
 model.save( args.model + ".h5" )
-
-dummy_training_input = numpy.zeros( shape=( 1, 10 ) )
-for x in range( 0, 9 ):
-    dummy_training_input[ 0 ][ x ] = 2 - ( x / 10 )
-
-dummy_training_output = numpy.zeros( shape=( 1, 2 ) )
-dummy_training_input[ 0 ][ 0 ] = -1
-dummy_training_input[ 0 ][ 1 ] = 1
-
 
 dummy_test_input = numpy.zeros( shape=( 1, 10 ) )
 for x in range( 0, 9 ):

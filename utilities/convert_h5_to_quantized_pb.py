@@ -114,6 +114,8 @@ else:
 
 import time
 saved_model_path = "./saved_models/{}".format(int(time.time()))
-tf.keras.experimental.export_saved_model(model, saved_model_path)
+converter = tf.lite.TFLiteConverter.from_keras_model(keras_model)
+tflite_model = converter.convert()
+tf.keras.experimental.export_saved_model( tflite_model, saved_model_path )
 saved_model_path
 
