@@ -1,5 +1,7 @@
 #!/bin/bash
 
+#THIS IS LIKELY OUT OF DATE
+
 #First, let's carve out a working directory
 mkdir demo
 cd demo

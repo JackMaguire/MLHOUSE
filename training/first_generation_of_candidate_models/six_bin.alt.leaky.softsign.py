@@ -15,7 +15,6 @@ import keras
 import numpy
 
 import sys
-#sys.path.append("/nas/longleaf/home/jackmag")#for h5py
 import h5py
 
 import argparse
@@ -38,30 +37,24 @@ sha1 = subprocess.check_output(["git", "--git-dir", full_name, "rev-parse", "HEA
 print ( "JackMaguire/MLHOUSE: " + str( sha1 ) )
 
 parser = argparse.ArgumentParser()
-parser.add_argument( "--model", help="filename for output file", default="rrrrl.Xx.leaky", required=False )
+parser.add_argument( "--model", help="filename for output file", default="six_bin.alt.leaky.softsign", required=False )
 args = parser.parse_args()
 
 
 num_input_dimensions = 9600
-num_neurons_in_layer1 = 1026 * 2
-num_neurons_in_layer2 = 342
-num_neurons_in_layer3 = 50
-num_neurons_in_layer4 = 10
-num_output_dimensions = 2
+num_neurons_in_layer1 = 1500
+num_neurons_in_layer2 = 500
+num_output_dimensions = 12
 model = Sequential()
 
-model.add( Dense( num_neurons_in_layer1, input_dim=num_input_dimensions, activation='relu') )
+model.add( Dense( num_neurons_in_layer1, input_dim=num_input_dimensions ) )
 model.add( LeakyReLU(alpha=.01) )
-model.add( Dense( num_neurons_in_layer2, activation='relu') )
+model.add( Dense( num_neurons_in_layer2 ) )
 model.add( LeakyReLU(alpha=.01) )
-model.add( Dense( num_neurons_in_layer3, activation='relu') )
-model.add( LeakyReLU(alpha=.01) )
-model.add( Dense( num_neurons_in_layer4, activation='relu') )
-model.add( LeakyReLU(alpha=.01) )
-model.add( Dense( num_output_dimensions, activation='linear') )
+model.add( Dense( num_output_dimensions, activation='softsign') )
 
 # 3) Compile Model
 
 metrics_to_output=[ 'accuracy' ]
-model.compile( loss='mean_squared_error', optimizer='adam', metrics=metrics_to_output )
+model.compile( loss='mean_absolute_error', optimizer='adam', metrics=metrics_to_output )
 model.save( args.model + ".h5" )

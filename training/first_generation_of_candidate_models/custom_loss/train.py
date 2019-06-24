@@ -9,6 +9,8 @@ from keras.models import Sequential
 from keras.layers import Dense
 from keras import metrics
 
+import keras.losses
+
 from keras.models import load_model
 import keras.backend as K
 import keras.callbacks
@@ -183,12 +185,41 @@ def generate_data_from_files( filenames_csv, six_bin ):
         return input_no_resid, output_no_resid
 
 
+#https://towardsdatascience.com/advanced-keras-constructing-complex-custom-losses-and-metrics-c07ca130a618
+def custom_loss():
+    def loss( y_true, y_pred ):
+        #using notation from https://ml-cheatsheet.readthedocs.io/en/latest/loss_functions.html where
+        #p: predicted probability ( 0 to 1 )
+        #y: actual probability ( 0 to 1 )
+        #y_pred: predicted probability (-1 to 1)
+        p=(y_pred + 1)/2
+        if y_true == 1:
+            return -1*K.log( p )
+        else: # y_true == 0
+            return -1*K.log( 1 - p )
+
+    return loss
+
+def loss( y_true, y_pred ):
+    #using notation from https://ml-cheatsheet.readthedocs.io/en/latest/loss_functions.html where
+    #p: predicted probability ( 0 to 1 )
+    #y: actual probability ( 0 to 1 )
+    #y_pred: predicted probability (-1 to 1)
+    p=(y_pred + 1)/2
+    if y_true == 1:
+        return -1*K.log( p )
+    else: # y_true == 0
+        return -1*K.log( 1 - p )
+
+
+keras.losses.custom_loss = custom_loss
+
 #########
 # START #
 #########
 
 if os.path.isfile( args.model ):
-    model = load_model( args.model )
+    model = load_model( args.model, custom_objects={'loss': loss} )
 else:
     print( "Model " + args.model + " is not a file" )
     exit( 1 )
