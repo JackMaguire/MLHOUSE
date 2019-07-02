@@ -42,9 +42,9 @@ num_neurons_in_layer2 = 1000
 num_output_dimensions = 1
 model = Sequential()
 
-model.add( Dense( num_neurons_in_layer1, input_dim=num_input_dimensions, activation='relu' ) )
-model.add( Dense( num_neurons_in_layer2, activation='relu') )
-model.add( Dense( num_output_dimensions, activation='linear') )
+model.add( Dense( num_neurons_in_layer1, input_dim=num_input_dimensions, activation='relu', name="hidden1" ) )
+model.add( Dense( num_neurons_in_layer2, activation='relu', name="hidden2" ) )
+model.add( Dense( num_output_dimensions, activation='linear', name="out") )
 
 metrics_to_output=[ 'accuracy' ]
 model.compile( loss='mean_squared_error', optimizer='adam', metrics=metrics_to_output )
