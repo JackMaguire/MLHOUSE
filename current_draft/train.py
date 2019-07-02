@@ -208,17 +208,13 @@ tensorflow.keras.losses.custom_loss = custom_loss
 # START #
 #########
 
-if os.path.isfile( "../current.1.h5" ):
-    model1 = load_model( "../current.1.h5" )
+if os.path.isfile( "../current.advanced1.conv.conv.fences.h5" ):
+    cc_fen_model = load_model( "../current.advanced1.conv.conv.fences.h5" )
 else:
-    print( "Model ../current.1.h5 is not a file" )
+    print( "Model ../current.advanced1.conv.conv.fences.h5 is not a file" )
     exit( 1 )
 
-if os.path.isfile( "../current.2.h5" ):
-    model2 = load_model( "../current.2.h5" )
-else:
-    print( "Model ../current.2.h5 is not a file" )
-    exit( 1 )
+# TODO
 
 # 4) Fit Model
 
