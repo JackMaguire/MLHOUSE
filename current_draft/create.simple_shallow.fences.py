@@ -32,22 +32,18 @@ import subprocess
 numpy.random.seed( 0 )
 
 parser = argparse.ArgumentParser()
-parser.add_argument( "--model", help="filename for output file", default="start.2", required=False )
+parser.add_argument( "--model", help="filename for output file", default="start.simple_shallow.fences", required=False )
 args = parser.parse_args()
 
 
 num_input_dimensions = 9600
 num_neurons_in_layer1 = 1500
 num_neurons_in_layer2 = 1000
-num_neurons_in_layer3 = 1000
-num_neurons_in_layer4 = 1000
 num_output_dimensions = 8
 model = Sequential()
 
 model.add( Dense( num_neurons_in_layer1, input_dim=num_input_dimensions, activation='relu' ) )
 model.add( Dense( num_neurons_in_layer2, activation='relu') )
-model.add( Dense( num_neurons_in_layer3, activation='relu') )
-model.add( Dense( num_neurons_in_layer4, activation='relu') )
 model.add( Dense( num_output_dimensions, activation='sigmoid') )
 
 metrics_to_output=[ 'accuracy' ]
