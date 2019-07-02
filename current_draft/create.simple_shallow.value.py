@@ -44,8 +44,8 @@ model = Sequential()
 
 model.add( Dense( num_neurons_in_layer1, input_dim=num_input_dimensions, activation='relu' ) )
 model.add( Dense( num_neurons_in_layer2, activation='relu') )
-model.add( Dense( num_output_dimensions, activation='sigmoid') )
+model.add( Dense( num_output_dimensions, activation='linear') )
 
 metrics_to_output=[ 'accuracy' ]
-model.compile( loss='binary_crossentropy', optimizer='adam', metrics=metrics_to_output )
+model.compile( loss='mean_squared_error', optimizer='adam', metrics=metrics_to_output )
 model.save( args.model + ".h5" )
