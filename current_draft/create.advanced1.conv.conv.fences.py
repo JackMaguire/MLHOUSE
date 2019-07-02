@@ -61,7 +61,7 @@ num_output_dimensions = 8
 input1 = Input(shape=(num_input_dimensions1,), name="in1", dtype="float32" )
 
 #input2 = Input(shape=(num_input_dimensions2,), name="in2", dtype="float32" )
-input2 = Input(shape=(39, 19, 14,), name="in2", dtype="float32" )
+input2 = Input(shape=(36, 19, 14,), name="in2", dtype="float32" )
 
 convA = Conv2D( name="convA", filters=5, kernel_size=(1,1), padding='valid', input_shape=(36, 19, 14), data_format='channels_last', activation='relu', use_bias=True )( input2 )
 convB = Conv2D( name="convB", filters=5, kernel_size=(3,3), padding='valid', input_shape=(36, 19,  5), data_format='channels_last', activation='relu', use_bias=True )( convA )
