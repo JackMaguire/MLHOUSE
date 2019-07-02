@@ -1,6 +1,6 @@
 import os
-#os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
-#os.environ["CUDA_VISIBLE_DEVICES"] = ""
+os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
+os.environ["CUDA_VISIBLE_DEVICES"] = ""
 
 #from tensorflow.keras import *
 from tensorflow.keras.models import Sequential
@@ -41,13 +41,6 @@ tf_export(
 ########
 # INIT #
 ########
-
-num_input_dimensions = 20021
-num_neurons_in_layer1 = 4000
-num_neurons_in_layer2 = 2000
-num_neurons_in_layer3 = 500
-num_neurons_in_layer4 = 100
-num_output_dimensions = 2
 
 numpy.random.seed( 0 )
 
