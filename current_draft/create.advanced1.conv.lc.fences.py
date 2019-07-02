@@ -37,7 +37,7 @@ import subprocess
 numpy.random.seed( 0 )
 
 parser = argparse.ArgumentParser()
-parser.add_argument( "--model", help="filename for output file", default="start.advanced1.conv.lc.value", required=False )
+parser.add_argument( "--model", help="filename for output file", default="start.advanced1.conv.lc.fences", required=False )
 args = parser.parse_args()
 
 
