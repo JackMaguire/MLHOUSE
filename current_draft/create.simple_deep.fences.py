@@ -53,3 +53,4 @@ model.add( Dense( num_output_dimensions, activation='sigmoid', name="out") )
 metrics_to_output=[ 'accuracy' ]
 model.compile( loss='binary_crossentropy', optimizer='adam', metrics=metrics_to_output )
 model.save( args.model + ".h5" )
+model.summary()

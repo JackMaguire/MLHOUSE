@@ -236,3 +236,4 @@ file.close()
 #average_ddg_int = deviation_ddg_int / int_count
 
 #print( "RESULTS: " + str(average_score) + " " + str(average_ddg) + " " + str(average_score_int) + " " + str(average_ddg_int) + " " + str(count) + " " + str(int_count) )
+

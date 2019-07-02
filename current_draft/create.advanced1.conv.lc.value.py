@@ -37,7 +37,7 @@ import subprocess
 numpy.random.seed( 0 )
 
 parser = argparse.ArgumentParser()
-parser.add_argument( "--model", help="filename for output file", default="start.advanced1.value", required=False )
+parser.add_argument( "--model", help="filename for output file", default="start.advanced1.conv.lc.value", required=False )
 args = parser.parse_args()
 
 
@@ -80,3 +80,4 @@ model = Model(inputs=[input1, input2], outputs=output )
 metrics_to_output=[ 'accuracy' ]
 model.compile( loss='mean_squared_error', optimizer='adam', metrics=metrics_to_output )
 model.save( args.model + ".h5" )
+model.summary()
