@@ -7,6 +7,7 @@ import os
 
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense
+from tensorflow.keras.layers import Reshape
 from tensorflow.keras.layers import Input
 from tensorflow.keras.layers import Flatten
 from tensorflow.keras.layers import Conv2D
@@ -44,11 +45,13 @@ num_input_dimensions1 = 26
 num_input_dimensions2 = 18494 - num_input_dimensions1
 
 input1 = Input(shape=(num_input_dimensions1,), name="in1", dtype="float32" )
-input2 = Input(shape=(36, 19, 27,), name="in2", dtype="float32" )
 
+#input2 = Input(shape=(36, 19, 27,), name="in2", dtype="float32" )
+input2 = Input(shape=(18468,), name="in2", dtype="float32" )
 
 # Phase 1: in2 -> ABCDE
-A = Conv2D( name="layerA", filters=30, kernel_size=(1,1), padding='valid', input_shape=(36, 19, 27), data_format='channels_last', activation='relu', use_bias=True )( input2 )
+pre = Reshape( target_shape=(36, 19, 27,) )( input2 )
+A = Conv2D( name="layerA", filters=30, kernel_size=(1,1), padding='valid', input_shape=(36, 19, 27), data_format='channels_last', activation='relu', use_bias=True )( pre )
 B = Conv2D( name="layerB", filters=30, kernel_size=(1,1), padding='valid', input_shape=(36, 19, 30), data_format='channels_last', activation='relu', use_bias=True )( A )
 #C = LocallyConnected2D( name="layerC", filters=25, kernel_size=(1,1), padding='valid', input_shape=(36, 19, 30), data_format='channels_last', activation='relu', use_bias=True )( B )
 C = Conv2D( name="layerC", filters=30, kernel_size=(1,1), padding='valid', input_shape=(36, 19, 30), data_format='channels_last', activation='relu', use_bias=True )( B )
