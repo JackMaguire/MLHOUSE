@@ -159,27 +159,16 @@ def generate_data_from_files( filenames_csv, six_bin ):
     source_input_no_resid = input[:,1:27]
     ray_input_no_resid = input[:,27:]
 
-    print( "output.shape:" )
-    print( output.shape )
+    #print( "output.shape:" )
+    #print( output.shape )
     output_no_resid = output[:,1:2]
-    print( "output_no_resid.shape:" )
-    print( output_no_resid.shape )
+    #print( "output_no_resid.shape:" )
+    #print( output_no_resid.shape )
 
     my_assert_equals_thrower( "len( source_input_no_resid[ 0 ] )", len( source_input_no_resid[ 0 ] ), num_source_residue_inputs );
     my_assert_equals_thrower( "len( ray_input_no_resid[ 0 ] )",    len( ray_input_no_resid[ 0 ] ), num_ray_inputs );
 
-    #https://www.kaggle.com/vishwasgpai/guide-for-creating-cnn-model-using-csv-file
-
-    for x in range( 0, len( output_no_resid ) ):
-        my_assert_equals_thrower( "len(output_no_resid[x])", len(output_no_resid[x]), 1 )
-        val = output_no_resid[x][0]
-        if( val > 1 ):
-            val = math.sqrt( val )
-        #subtract mean of -2:
-        val += 2.0
-        #divide by span of 3:
-        val /= 3.0
-        
+    #https://www.kaggle.com/vishwasgpai/guide-for-creating-cnn-model-using-csv-file        
 
     if six_bin:
         six_bin_output_no_resid = output_no_resid.copy()
@@ -198,6 +187,15 @@ def generate_data_from_files( filenames_csv, six_bin ):
         return source_input_no_resid, ray_input_no_resid, six_bin_output_no_resid
     else:
         my_assert_equals_thrower( "len( output_no_resid[ 0 ] )", len( output_no_resid[ 0 ] ), num_output_dimensions );
+        for x in range( 0, len( output_no_resid ) ):
+            my_assert_equals_thrower( "len(output_no_resid[x])", len(output_no_resid[x]), 1 )
+            val = output_no_resid[x][0]
+            if( val > 1 ):
+                val = math.sqrt( val )
+                #subtract mean of -2:
+                val += 2.0
+                #divide by span of 3:
+                val /= 3.0
         return source_input_no_resid, ray_input_no_resid, output_no_resid
 
 
