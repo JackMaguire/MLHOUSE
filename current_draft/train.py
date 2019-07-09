@@ -23,6 +23,7 @@ import h5py
 
 import pandas as pd
 import gzip
+import math
 
 import argparse
 import random
@@ -160,7 +161,7 @@ def generate_data_from_files( filenames_csv, six_bin ):
 
     print( "output.shape:" )
     print( output.shape )
-    output_no_resid = output[:,1:1]
+    output_no_resid = output[:,1:2]
     print( "output_no_resid.shape:" )
     print( output_no_resid.shape )
 
@@ -168,6 +169,17 @@ def generate_data_from_files( filenames_csv, six_bin ):
     my_assert_equals_thrower( "len( ray_input_no_resid[ 0 ] )",    len( ray_input_no_resid[ 0 ] ), num_ray_inputs );
 
     #https://www.kaggle.com/vishwasgpai/guide-for-creating-cnn-model-using-csv-file
+
+    for x in range( 0, len( output_no_resid ) ):
+        my_assert_equals_thrower( "len(output_no_resid[x])", len(output_no_resid[x]), 1 )
+        val = output_no_resid[x][0]
+        if( val > 1 ):
+            val = math.sqrt( val )
+        #subtract mean of -2:
+        val += 2.0
+        #divide by span of 3:
+        val /= 3.0
+        
 
     if six_bin:
         six_bin_output_no_resid = output_no_resid.copy()
@@ -243,7 +255,7 @@ for line in file_lines:
     print( "reading " + str( line ) )
     t0 = time.time()
     try:
-        source_input, ray_input, output = generate_data_from_files( line, True )
+        source_input, ray_input, output = generate_data_from_files( line, False )
     except AssertError:
         continue
     t1 = time.time()
