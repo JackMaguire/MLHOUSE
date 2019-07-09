@@ -117,6 +117,10 @@ def generate_data_from_files( filenames_csv, six_bin ):
     assert_vecs_line_up( input, output )
 
     input_no_resid = input[:,25:]
+    test = input[:,1:25]
+
+    print( input_no_resid.shape )
+    print( test.shape )
 
     output_no_resid = output[:,1:]
 

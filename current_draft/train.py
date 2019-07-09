@@ -53,8 +53,16 @@ set_session(sess)  # set this TensorFlow session as the default session for Kera
 # INIT #
 ########
 
-num_input_dimensions = 9600
-num_output_dimensions = 8
+num_input_dimensions = 18494
+num_source_residue_inputs = 26
+num_ray_inputs = 18494 - 26
+WIDTH = 36
+HEIGHT = 19
+CHANNELS = 27
+if( WIDTH * HEIGHT * CHANNELS != num_ray_inputs ):
+    print( "WIDTH * HEIGHT * CHANNELS != num_ray_inputs" )
+    exit( 1 )
+num_output_dimensions = 1
 
 numpy.random.seed( 0 )
 
@@ -147,11 +155,17 @@ def generate_data_from_files( filenames_csv, six_bin ):
 
     assert_vecs_line_up( input, output )
 
-    input_no_resid = input[:,1:]
+    source_input_no_resid = input[:,1:27]
+    ray_input_no_resid = input[:,27:]
 
-    output_no_resid = output[:,1:]
+    print( "output.shape:" )
+    print( output.shape )
+    output_no_resid = output[:,1:1]
+    print( "output_no_resid.shape:" )
+    print( output_no_resid.shape )
 
-    my_assert_equals_thrower( "len( input_no_resid[ 0 ] )", len( input_no_resid[ 0 ] ), num_input_dimensions );
+    my_assert_equals_thrower( "len( source_input_no_resid[ 0 ] )", len( source_input_no_resid[ 0 ] ), num_source_residue_inputs );
+    my_assert_equals_thrower( "len( ray_input_no_resid[ 0 ] )",    len( ray_input_no_resid[ 0 ] ), num_ray_inputs );
 
     #https://www.kaggle.com/vishwasgpai/guide-for-creating-cnn-model-using-csv-file
 
@@ -169,10 +183,10 @@ def generate_data_from_files( filenames_csv, six_bin ):
             six_bin_output_no_resid[ x ][ 5 ] = 1.0 if output_no_resid[ x ][ 0 ] <= 3.0  else 0.0
             six_bin_output_no_resid[ x ][ 6 ] = 1.0 if output_no_resid[ x ][ 0 ] <= 5.0  else 0.0
             six_bin_output_no_resid[ x ][ 7 ] = 1.0 if output_no_resid[ x ][ 0 ] <= 7.0  else 0.0
-        return input_no_resid, six_bin_output_no_resid
+        return source_input_no_resid, ray_input_no_resid, six_bin_output_no_resid
     else:
         my_assert_equals_thrower( "len( output_no_resid[ 0 ] )", len( output_no_resid[ 0 ] ), num_output_dimensions );
-        return input_no_resid, output_no_resid
+        return source_input_no_resid, ray_input_no_resid, output_no_resid
 
 
 #https://towardsdatascience.com/advanced-keras-constructing-complex-custom-losses-and-metrics-c07ca130a618
@@ -208,13 +222,11 @@ tensorflow.keras.losses.custom_loss = custom_loss
 # START #
 #########
 
-if os.path.isfile( "../current.advanced1.conv.conv.fences.h5" ):
-    cc_fen_model = load_model( "../current.advanced1.conv.conv.fences.h5" )
+if os.path.isfile( "../current.advanced2.5C.5L.5D.value.h5" ):
+    model1 = load_model( "../current.advanced2.5C.5L.5D.value.h5" )
 else:
-    print( "Model ../current.advanced1.conv.conv.fences.h5 is not a file" )
+    print( "Model ../current.advanced2.5C.5L.5D.value.h5 is not a file" )
     exit( 1 )
-
-# TODO
 
 # 4) Fit Model
 
@@ -231,12 +243,11 @@ for line in file_lines:
     print( "reading " + str( line ) )
     t0 = time.time()
     try:
-        input, output = generate_data_from_files( line, True )
+        source_input, ray_input, output = generate_data_from_files( line, True )
     except AssertError:
         continue
     t1 = time.time()
-    model1.train_on_batch( x=input, y=output )
-    model2.train_on_batch( x=input, y=output )
+    model1.train_on_batch( x=[source_input,ray_input], y=output )
     t2 = time.time()
     time_spent_loading += t1 - t0
     time_spent_training += t2 - t1
@@ -245,6 +256,5 @@ print( str( float( time_spent_loading ) / float(time_spent_loading + time_spent_
 print( time_spent_loading )
 print( time_spent_training )
 
-model1.save( "final.1.h5" )
-model2.save( "final.2.h5" )
+model1.save( "final.advanced2.5C.5L.5D.value.h5" )
 

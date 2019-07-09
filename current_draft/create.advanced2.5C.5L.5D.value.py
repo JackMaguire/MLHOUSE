@@ -38,7 +38,7 @@ import subprocess
 numpy.random.seed( 0 )
 
 parser = argparse.ArgumentParser()
-parser.add_argument( "--model", help="filename for output file", default="start.advanced2.CCLLL.value", required=False )
+parser.add_argument( "--model", help="filename for output file", default="start.advanced2.5C.5L.5D.value", required=False )
 args = parser.parse_args()
 
 num_input_dimensions1 = 26
@@ -50,7 +50,8 @@ input1 = Input(shape=(num_input_dimensions1,), name="in1", dtype="float32" )
 input2 = Input(shape=(18468,), name="in2", dtype="float32" )
 
 # Phase 1: in2 -> ABCDE
-pre = Reshape( target_shape=(36, 19, 27,) )( input2 )
+
+pre = Reshape( target_shape=(36, 19, 27,) )( input2 )#ALWAYS DO WIDTH, HEIGHT, CHANNELS
 A = Conv2D( name="layerA", filters=30, kernel_size=(1,1), padding='valid', input_shape=(36, 19, 27), data_format='channels_last', activation='relu', use_bias=True )( pre )
 B = Conv2D( name="layerB", filters=30, kernel_size=(1,1), padding='valid', input_shape=(36, 19, 30), data_format='channels_last', activation='relu', use_bias=True )( A )
 #C = LocallyConnected2D( name="layerC", filters=25, kernel_size=(1,1), padding='valid', input_shape=(36, 19, 30), data_format='channels_last', activation='relu', use_bias=True )( B )
