@@ -1,8 +1,5 @@
-#include <pybind11/pybind11.h>
-
-#include "xtensor-python/pyarray.hpp"
-#include "xtensor/xarray.hpp"
-#include "xtensor/xview.hpp"
+#include <boost/python.hpp>
+#include <boost/python/numpy.hpp>
 
 #include <math.h>
 #include <fstream>
@@ -14,9 +11,16 @@
   
 */
 
-namespace py = pybind11;
+//namespace py = pybind11;
 
-using ndarray = xt::pyarray< float >;
+//using ndarray = xt::pyarray< float >;
+
+using namespace boost;
+using namespace boost::python;
+using namespace boost::python::numpy;
+
+namespace p = boost::python;
+namespace np = boost::python::numpy;
 
 namespace mouse_io {
 
@@ -38,10 +42,12 @@ generate_output_data(
 ){
   int const total_number_of_elements = tokenized_file_lines_of_output_file.size();
 
-  ndarray output_values = xt::zeros< float >({total_number_of_elements});//TODO use better ctor
+  p::object tu = p::make_tuple( '1','1','1', std::to_string(total_number_of_elements) );
+  ndarray output_values( tu );
+  float * ndarray_data = reinterpret_cast< float * > output_values.get_data();
 
   for( int i = 0; i < total_number_of_elements; ++i ){
-    output_values[ i ] = std::stof( tokenized_file_lines_of_output_file[ i ][ 1 ] );
+    ndarray_data[ i ] = std::stof( tokenized_file_lines_of_output_file[ i ][ 1 ] );
   }
 
   return output_values;
@@ -107,13 +113,13 @@ read_mouse_data(
 
 } //namespace mouse_io
 
-int add(int i, int j) {
-  return i + j;
-}
+/*int main(int argc, char **argv) {
+  Py_Initialize();
+  initialize();
+}*/
 
-PYBIND11_MODULE( example, m ) {
-  //m.doc() = "pybind11 example plugin"; // optional module docstring
-  m.def("read_mouse_data", &mouse_io::read_mouse_data, "TODO");
+BOOST_PYTHON_MODULE( jack_mouse_test )
+{
+    using namespace boost::python;
+    def( "read_mouse_data", read_mouse_data );
 }
-
-//c++ -O3 -Wall -shared -std=c++11 -fPIC `python3 -m pybind11 --includes` example.cpp -o example`python3-config --extension-suffix`

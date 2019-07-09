@@ -259,8 +259,9 @@ for line in file_lines:
         continue
     t1 = time.time()
     #submitting in batches to save memory on the GPU
+    #64 works, 128 is too large
     #model1.train_on_batch( x=[source_input,ray_input], y=output )
-    model1.fit( x=[source_input,ray_input], y=output, epochs=1, batch_size=128 )
+    model1.fit( x=[source_input,ray_input], y=output, epochs=1, batch_size=64 )
     t2 = time.time()
     time_spent_loading += t1 - t0
     time_spent_training += t2 - t1
