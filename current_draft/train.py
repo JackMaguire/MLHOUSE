@@ -190,12 +190,13 @@ def generate_data_from_files( filenames_csv, six_bin ):
         for x in range( 0, len( output_no_resid ) ):
             my_assert_equals_thrower( "len(output_no_resid[x])", len(output_no_resid[x]), 1 )
             val = output_no_resid[x][0]
+            #Stunt large values
             if( val > 1 ):
                 val = math.sqrt( val )
-                #subtract mean of -2:
-                val += 2.0
-                #divide by span of 3:
-                val /= 3.0
+            #subtract mean of -2:
+            val += 2.0
+            #divide by span of 3:
+            val /= 3.0
         return source_input_no_resid, ray_input_no_resid, output_no_resid
 
 
@@ -257,7 +258,9 @@ for line in file_lines:
     except AssertError:
         continue
     t1 = time.time()
-    model1.train_on_batch( x=[source_input,ray_input], y=output )
+    #submitting in batches to save memory on the GPU
+    #model1.train_on_batch( x=[source_input,ray_input], y=output )
+    model1.fit( x=[source_input,ray_input], y=output, epochs=1, batch_size=64 )
     t2 = time.time()
     time_spent_loading += t1 - t0
     time_spent_training += t2 - t1
