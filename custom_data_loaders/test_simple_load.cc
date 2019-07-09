@@ -14,6 +14,8 @@
   
 */
 
+#include <Python.h>
+
 namespace py = pybind11;
 
 using ndarray = xt::pyarray< float >;
