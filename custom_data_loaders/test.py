@@ -1,13 +1,16 @@
 import jack_mouse_test
 
 import numpy
+import pandas as pd
+import gzip
+import math
 
 ############
 # SETTINGS #
 ############
 
-output_file_path="../reshape_testbed/input.test.csv"
-output_file_path="../reshape_testbed/output.test.csv"
+input_file_path= "input.test.csv"
+output_file_path="output.test.csv"
 
 #############
 # CONSTANTS #
@@ -25,6 +28,29 @@ if( WIDTH * HEIGHT * CHANNELS != num_ray_inputs ):
 num_output_dimensions = 1
 
 ##########
+
+def my_assert_equals( name, actual, theoretical ):
+    if actual != theoretical:
+        print( str( name ) + " is equal to " + str( actual ) + " instead of " + str( theoretical ) )
+        exit( 1 )
+
+class AssertError(Exception):
+    pass
+
+def my_assert_equals_thrower( name, actual, theoretical ):
+    if actual != theoretical:
+        print( str( name ) + " is equal to " + str( actual ) + " instead of " + str( theoretical ) )
+        raise AssertError
+
+def assert_vecs_line_up( input, output ):
+    #Each line starts with "RESID: XXX,"
+    my_assert_equals_thrower( "input file length", len( input ), len( output ) )
+    for i in range( 0, len( input ) ):
+        in_elem = input[ i ][ 0 ]
+        in_resid = int( in_elem.split( " " )[ 1 ] )
+        out_elem = output[ i ][ 0 ]
+        out_resid = int( out_elem.split( " " )[ 1 ] )
+        my_assert_equals_thrower( "out_resid", out_resid, in_resid )
 
 def generate_data_from_files( input_filename, output_filename, six_bin ):
 
