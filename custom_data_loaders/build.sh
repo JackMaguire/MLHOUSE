@@ -1,5 +1,7 @@
 #!/bin/bash
 
+#requires sudo apt-get install libboost-all-dev
+
 #clang++ -L /usr/lib/x86_64-linux -Wall -fPIC -shared -O3 -std=c++17 -o jack_mouse_test.dll boost_impl.cc -I/usr/include/python3.6m -lboost_system
 
 name=jack_mouse_test
