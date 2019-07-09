@@ -9,8 +9,8 @@ import math
 # SETTINGS #
 ############
 
-input_file_path= "input.test.csv"
-output_file_path="output.test.csv"
+input_file_path= "test.input.csv"
+output_file_path="test.output.csv"
 
 #############
 # CONSTANTS #
@@ -130,6 +130,14 @@ def generate_data_from_files( input_filename, output_filename, six_bin ):
 
 
 
-cpp_output = jack_mouse_test.read_mouse_data( output_file_path )
+cpp_structs = jack_mouse_test.read_mouse_data( output_file_path )
+cpp_output = cpp_structs[ 0 ]
 py_source_input, py_ray_input, py_output = generate_data_from_files( input_file_path, output_file_path, False )
 
+print( cpp_output.shape )
+print( py_output.shape )
+#exit( 0 )
+
+my_assert_equals_thrower( "TEST 1", len( cpp_output ), len( py_output ) )
+for x in range( 0, len( cpp_output ) ):
+    my_assert_equals_thrower( "TEST 1." + str( x ), cpp_output[ x ], py_output[ x ] )

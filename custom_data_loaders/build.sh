@@ -4,8 +4,8 @@
 
 name=jack_mouse_test
 
-#debug=""
-debug="-g"
+debug=""
+#debug="-g"
 
 clang++ -c -fPIC boost_impl.cc -o ${name}.o -Wall -O3 -std=c++17 -I/usr/include/python3.6m $debug
 

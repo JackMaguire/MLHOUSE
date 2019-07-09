@@ -45,7 +45,7 @@ generate_output_data(
   int const total_number_of_elements = tokenized_file_lines_of_output_file.size();
 
   //https://www.boost.org/doc/libs/1_64_0/libs/python/doc/html/numpy/tutorial/simple.html
-  p::tuple shape = p::make_tuple( 1, 1, 1, total_number_of_elements );
+  p::tuple shape = p::make_tuple( total_number_of_elements, 1 );
   np::dtype dtype = np::dtype::get_builtin<float>();
   np::ndarray output_values = np::empty( shape, dtype );
   
