@@ -4,8 +4,9 @@
 
 name=jack_mouse_test
 
-clang++ -c -fPIC boost_impl.cc -o ${name}.o -Wall -O3 -std=c++17 -I/usr/include/python3.6m #-I/home/jackmag/boost_1_68_0
+#debug=""
+debug="-g"
 
-clang++ -L /usr/lib/x86_64-linux-gnu -Wall -fPIC -shared -Wl,-soname,${name}.so -O3 -std=c++17 -o ${name}.cpython-36m-x86_64-linux-gnu.so ${name}.o -I/usr/include/python3.6m -lboost_system -lboost_python3 -lpython3.6m -lboost_numpy3
+clang++ -c -fPIC boost_impl.cc -o ${name}.o -Wall -O3 -std=c++17 -I/usr/include/python3.6m $debug
 
-#clang++ -L /home/jackmag/boost_1_68_0/stage/lib -Wall -fPIC -shared -Wl,-soname,${name}.so -O3 -std=c++17 -o ${name}.cpython-36m-x86_64-linux-gnu.so ${name}.o -I/usr/include/python3.6m -lboost_system -lboost_python -lpython3.6m -I/home/jackmag/boost_1_68_0
+clang++ -L /usr/lib/x86_64-linux-gnu -Wall -fPIC -shared -Wl,-soname,${name}.so -O3 -std=c++17 -o ${name}.cpython-36m-x86_64-linux-gnu.so ${name}.o -I/usr/include/python3.6m -lboost_system -lboost_python3 -lpython3.6m -lboost_numpy3 $debug

@@ -126,6 +126,8 @@ read_mouse_data(
 
 BOOST_PYTHON_MODULE( jack_mouse_test )
 {
-    using namespace boost::python;
-    def( "read_mouse_data", mouse_io::read_mouse_data );
+  using namespace boost::python;
+  Py_Initialize();
+  np::initialize();
+  def( "read_mouse_data", mouse_io::read_mouse_data );
 }
