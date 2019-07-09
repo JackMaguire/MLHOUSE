@@ -4,6 +4,7 @@ import numpy
 import pandas as pd
 import gzip
 import math
+import time
 
 ############
 # SETTINGS #
@@ -34,6 +35,12 @@ def my_assert_equals( name, actual, theoretical ):
         print( str( name ) + " is equal to " + str( actual ) + " instead of " + str( theoretical ) )
         exit( 1 )
 
+def my_assert_equals_close( name, actual, theoretical ):
+    if actual != theoretical:
+        print( str( name ) + " is equal to " + str( actual ) + " instead of " + str( theoretical ) )
+        exit( 1 )
+
+
 class AssertError(Exception):
     pass
 
@@ -41,6 +48,12 @@ def my_assert_equals_thrower( name, actual, theoretical ):
     if actual != theoretical:
         print( str( name ) + " is equal to " + str( actual ) + " instead of " + str( theoretical ) )
         raise AssertError
+
+def my_assert_equals_close_thrower( name, actual, theoretical ):
+    if abs(actual - theoretical) > 0.01:
+        print( str( name ) + " is equal to " + str( actual ) + " instead of " + str( theoretical ) )
+        raise AssertError
+
 
 def assert_vecs_line_up( input, output ):
     #Each line starts with "RESID: XXX,"
@@ -130,14 +143,20 @@ def generate_data_from_files( input_filename, output_filename, six_bin ):
 
 
 
+t0 = time.time()
 cpp_structs = jack_mouse_test.read_mouse_data( output_file_path )
 cpp_output = cpp_structs[ 0 ]
+t1 = time.time()
 py_source_input, py_ray_input, py_output = generate_data_from_files( input_file_path, output_file_path, False )
-
-print( cpp_output.shape )
-print( py_output.shape )
+t2 = time.time()
+#print( cpp_output.shape )
+#print( py_output.shape )
 #exit( 0 )
+
+print( "CPP time: " + str( t1 - t0 ) )
+print( "PY  time: " + str( t2 - t1 ) )
+print( "Ratio: " + str( (t2 - t1) / (t1 - t0) ) )
 
 my_assert_equals_thrower( "TEST 1", len( cpp_output ), len( py_output ) )
 for x in range( 0, len( cpp_output ) ):
-    my_assert_equals_thrower( "TEST 1." + str( x ), cpp_output[ x ], py_output[ x ] )
+    my_assert_equals_close_thrower( "TEST 1." + str( x ), cpp_output[ x ], py_output[ x ] )
