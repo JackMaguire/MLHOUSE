@@ -16,6 +16,8 @@ using ndarray_tmpl = xt::pyarray<T, xt::layout_type::row_major>;
 
 using ndarray = ndarray_tmpl< float >;
 
+namespace mouse_io {
+
 float
 normalize_output_value(
   float value
@@ -90,13 +92,15 @@ read_mouse_data(
   auto const output_data = generate_output_data( tokenized_file_lines_of_output_file );
 }
 
+} //namespace mouse_io
+
 int add(int i, int j) {
   return i + j;
 }
 
 PYBIND11_MODULE( example, m ) {
   //m.doc() = "pybind11 example plugin"; // optional module docstring
-  m.def("read_mouse_data", &read_mouse_data, "TODO");
+  m.def("read_mouse_data", &mouse_io::read_mouse_data, "TODO");
 }
 
 //c++ -O3 -Wall -shared -std=c++11 -fPIC `python3 -m pybind11 --includes` example.cpp -o example`python3-config --extension-suffix
