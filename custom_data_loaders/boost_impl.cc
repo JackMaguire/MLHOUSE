@@ -42,9 +42,14 @@ generate_output_data(
 ){
   int const total_number_of_elements = tokenized_file_lines_of_output_file.size();
 
-  p::object tu = p::make_tuple( '1','1','1', std::to_string(total_number_of_elements) );
-  ndarray output_values( tu );
-  float * ndarray_data = reinterpret_cast< float * > output_values.get_data();
+  //https://www.boost.org/doc/libs/1_64_0/libs/python/doc/html/numpy/tutorial/simple.html
+  p::tuple shape = p::make_tuple( 1, 1, 1, total_number_of_elements );
+  np::dtype dtype = np::dtype::get_builtin<float>();
+  np::ndarray output_values = np::empty( shape, dtype );
+  
+  // p::object tu = p::make_tuple( '1','1','1', std::to_string(total_number_of_elements) );
+  //ndarray output_values( tu );
+  float * ndarray_data = reinterpret_cast< float * > ( output_values.get_data() );
 
   for( int i = 0; i < total_number_of_elements; ++i ){
     ndarray_data[ i ] = std::stof( tokenized_file_lines_of_output_file[ i ][ 1 ] );
@@ -109,6 +114,7 @@ read_mouse_data(
 ) {
   auto const tokenized_file_lines_of_output_file = read_in_output_data( output_data_filename );
   auto const output_data = generate_output_data( tokenized_file_lines_of_output_file );
+  return output_data;
 }
 
 } //namespace mouse_io
@@ -121,5 +127,5 @@ read_mouse_data(
 BOOST_PYTHON_MODULE( jack_mouse_test )
 {
     using namespace boost::python;
-    def( "read_mouse_data", read_mouse_data );
+    def( "read_mouse_data", mouse_io::read_mouse_data );
 }
