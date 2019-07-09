@@ -6,6 +6,8 @@
 #include <sstream>
 #include <string>
 
+#include <iostream>
+
 /*
   https://blog.esciencecenter.nl/irregular-data-in-pandas-using-c-88ce311cb9ef
   
@@ -68,39 +70,29 @@ read_in_output_data(
   std::vector< std::array< std::string, 2 > > tokenized_file_lines_of_output_file;
   std::ifstream infile( filename );
   std::string line;
-  while( std::getline( infile, line, ',' ) ) {
-    std::istringstream iss( line );
-    std::string resid_tag;
-    std::string energy;
-    std::string ddg;
 
-    if ( !( iss >> resid_tag >> energy >> ddg ) ) {
+  while( std::getline( infile, line ) ) {
+    std::array< std::string, 2 > new_elements;
+    // [0]: resid tag
+    // [1]: energy
+    // [2]: ddg (omitted for now)
+    
+    std::stringstream ss( line );
+    if ( ! std::getline( ss, new_elements[ 0 ], ',' ) ){
+      std::cout << "Error at [0]" << std::endl;
       // error
       // TODO - learn how to best handle errors in python
       continue;//for now, just omit this line
     }
 
-    /*
-    //"RESID: ".size() == 7
-    constexpr int resid_tag_prefix_size = 7;
-
-    if( resid_tag.substr( 0, resid_tag_prefix_size ) != "RESID: " ){
+    if ( ! std::getline( ss, new_elements[ 1 ], ',' ) ){
+      std::cout << "Error at [1]" << std::endl;
       // error
       // TODO - learn how to best handle errors in python
-      continue;//for now, just omit this line      
+      continue;//for now, just omit this line
     }
 
-    //remove "RESID: " from beginning of tag and parse it as an int
-    int resid = std::stoi( resid_tag.substr( resid_tag_prefix_size ) );
-*/
-    //Can't seem to get emplace back to work. 
-    //Let's just go the slow way for now
-    std::array< std::string, 2 > new_element;
-    new_element[ 0 ] = resid_tag;
-    new_element[ 1 ] = energy;
-    //new_element[ 2 ] = ddg;
-
-    tokenized_file_lines_of_output_file.emplace_back( new_element );
+    tokenized_file_lines_of_output_file.emplace_back( new_elements );
   }
 
   // infile.close(); // Let RAII handle this
@@ -108,21 +100,17 @@ read_in_output_data(
   return tokenized_file_lines_of_output_file;
 }
 
-ndarray
+//ndarray
+boost::python::tuple
 read_mouse_data(
   std::string const & output_data_filename
 ) {
   auto const tokenized_file_lines_of_output_file = read_in_output_data( output_data_filename );
   auto const output_data = generate_output_data( tokenized_file_lines_of_output_file );
-  return output_data;
+  return boost::python::make_tuple( output_data );
 }
 
 } //namespace mouse_io
-
-/*int main(int argc, char **argv) {
-  Py_Initialize();
-  initialize();
-}*/
 
 BOOST_PYTHON_MODULE( jack_mouse_test )
 {
