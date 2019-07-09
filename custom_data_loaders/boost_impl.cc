@@ -109,12 +109,34 @@ struct InputElements{
 
   unsigned int next_index(){
     resids.emplace_back();
-    residue_data.emaplce_back();
+    residue_data.emplace_back();
     ray_data.emplace_back();
 
     return resids.size() - 1;
   }
 };
+
+ndarray
+generate_ray_data(
+  std::vector< std::array< float, (18494 - 27) > > const & ray_data
+){
+  int const total_number_of_elements = ray_data.size();
+
+  //https://www.boost.org/doc/libs/1_64_0/libs/python/doc/html/numpy/tutorial/simple.html
+  p::tuple shape = p::make_tuple( total_number_of_elements, (18494 - 27) );
+  np::dtype dtype = np::dtype::get_builtin<float>();
+  np::ndarray ray_values = np::empty( shape, dtype );
+  
+  //TODO this is 2D
+  float * ndarray_data = reinterpret_cast< float * > ( ray_values.get_data() );
+
+  //Let's see how well this gets optimized
+  for( int i = 0; i < total_number_of_elements; ++i ){
+    ndarray_data[ i ] = ray_data[ i ];
+  }
+
+  return ray_values;
+}
 
 ndarray
 generate_residue_data(
@@ -125,17 +147,17 @@ generate_residue_data(
   //https://www.boost.org/doc/libs/1_64_0/libs/python/doc/html/numpy/tutorial/simple.html
   p::tuple shape = p::make_tuple( total_number_of_elements, 27 );
   np::dtype dtype = np::dtype::get_builtin<float>();
-  np::ndarray output_values = np::empty( shape, dtype );
+  np::ndarray residue_values = np::empty( shape, dtype );
   
-  // p::object tu = p::make_tuple( '1','1','1', std::to_string(total_number_of_elements) );
-  //ndarray output_values( tu );
-  float * ndarray_data = reinterpret_cast< float * > ( output_values.get_data() );
+  //TODO this is 2D
+  float * ndarray_data = reinterpret_cast< float * > ( residue_values.get_data() );
 
+  //Let's see how well this gets optimized
   for( int i = 0; i < total_number_of_elements; ++i ){
-    ndarray_data[ i ] = std::stof( tokenized_file_lines_of_output_file[ i ][ 1 ] );
+    ndarray_data[ i ] = residue_data[ i ];
   }
 
-  return output_values;
+  return residue_values;
 }
 
 
