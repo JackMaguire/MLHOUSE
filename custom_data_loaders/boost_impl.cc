@@ -189,7 +189,7 @@ read_in_input_data(
     }
 
     for( unsigned int i = 0; i < 18468; ++i ){
-      elements.ray_data[ index ][ i ] = std::stof( tokens[ i + 28 ] );
+      elements.ray_data[ index ][ i ] = std::stof( tokens[ i + 27 ] );
     }
 
   }
@@ -235,6 +235,9 @@ read_mouse_data(
   } catch ( int error_no ){
     std::cerr << "Caught exception #" << error_no << std::endl;
     return boost::python::make_tuple( error_no );
+  } catch ( std::exception const & e ) {
+    std::cout << "Caught C++ Exception: " << e.what() << std::endl;
+    return boost::python::make_tuple( int( -1 ) );
   }
 }
 
