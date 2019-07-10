@@ -9,13 +9,8 @@
 #include <iostream>
 
 /*
-  https://blog.esciencecenter.nl/irregular-data-in-pandas-using-c-88ce311cb9ef
-  
+  https://blog.esciencecenter.nl/irregular-data-in-pandas-using-c-88ce311cb9ef  
 */
-
-//namespace py = pybind11;
-
-//using ndarray = xt::pyarray< float >;
 
 using namespace boost;
 using namespace boost::python;
@@ -98,8 +93,8 @@ read_in_output_data(
 
 struct InputElements{
   std::vector< std::string > resids;
-  std::vector< std::array< float, 27 > > residue_data;
-  std::vector< std::array< float, 18494 - 27 > > ray_data;
+  std::vector< std::array< float, 26 > > residue_data;
+  std::vector< std::array< float, 18468 > > ray_data;
 
   unsigned int next_index(){
     resids.emplace_back();
@@ -112,12 +107,12 @@ struct InputElements{
 
 ndarray
 generate_residue_data(
-  std::vector< std::array< float, 27 > > const & residue_data
+  std::vector< std::array< float, 26 > > const & residue_data
 ){
   int const total_number_of_elements = residue_data.size();
 
   //https://www.boost.org/doc/libs/1_64_0/libs/python/doc/html/numpy/tutorial/simple.html
-  p::tuple shape = p::make_tuple( total_number_of_elements, 27 );
+  p::tuple shape = p::make_tuple( total_number_of_elements, 26 );
   np::dtype dtype = np::dtype::get_builtin<float>();
   np::ndarray residue_values = np::empty( shape, dtype );
   
@@ -125,8 +120,8 @@ generate_residue_data(
 
   //Let's see how well this gets optimized
   for( int line = 0; line < residue_data.size(); ++line ){
-    for( int i = 0; i < 27; ++i ){
-      ndarray_data[ line * 27 + i ] = residue_data[ line ][ i ];
+    for( int i = 0; i < 26; ++i ){
+      ndarray_data[ line * 26 + i ] = residue_data[ line ][ i ];
     }
   }
 
@@ -136,18 +131,18 @@ generate_residue_data(
 
 ndarray
 generate_ray_data(
-  std::vector< std::array< float, (18494 - 27) > > const & ray_data
+  std::vector< std::array< float, 18468 > > const & ray_data
 ){
   //https://www.boost.org/doc/libs/1_64_0/libs/python/doc/html/numpy/tutorial/simple.html
-  p::tuple shape = p::make_tuple( ray_data.size(), (18494 - 27) );
+  p::tuple shape = p::make_tuple( ray_data.size(), 18468 );
   np::dtype dtype = np::dtype::get_builtin<float>();
   np::ndarray ray_values = np::empty( shape, dtype );
   float * ndarray_data = reinterpret_cast< float * > ( ray_values.get_data() );
 
   //Let's see how well this gets optimized
   for( int line = 0; line < ray_data.size(); ++line ){
-    for( int ray = 0; ray < (18494 - 27); ++ray ){
-      ndarray_data[ line * (18494 - 27) + ray ] = ray_data[ line ][ ray ];
+    for( int ray = 0; ray < 18468; ++ray ){
+      ndarray_data[ line * 18468 + ray ] = ray_data[ line ][ ray ];
     }
   }
 
@@ -189,11 +184,11 @@ read_in_input_data(
     unsigned int const index = elements.next_index();
     elements.resids[ index ] = tokens[ 0 ];
 
-    for( unsigned int i = 0; i < 27; ++i ){
+    for( unsigned int i = 0; i < 26; ++i ){
       elements.residue_data[ index ][ i ] = std::stof( tokens[ i + 1 ] );
     }
 
-    for( unsigned int i = 0; i < (18494 - 27); ++i ){
+    for( unsigned int i = 0; i < 18468; ++i ){
       elements.ray_data[ index ][ i ] = std::stof( tokens[ i + 28 ] );
     }
 

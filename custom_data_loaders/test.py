@@ -152,8 +152,8 @@ t2 = time.time()
 if( len( cpp_structs ) < 3 ):
     print( "CPP found an exception" )
     exit( cpp_structs[ 0 ] )
-res_input = cpp_structs[ 0 ]
-ray_input = cpp_structs[ 1 ]
+cpp_res_input = cpp_structs[ 0 ]
+cpp_ray_input = cpp_structs[ 1 ]
 cpp_output = cpp_structs[ 2 ]
 
 
@@ -165,6 +165,17 @@ print( "CPP time: " + str( t1 - t0 ) )
 print( "PY  time: " + str( t2 - t1 ) )
 print( "Ratio: " + str( (t2 - t1) / (t1 - t0) ) )
 
-my_assert_equals_thrower( "TEST 1", len( cpp_output ), len( py_output ) )
+#### TEST RAY_INPUT ####
+my_assert_equals_thrower( "TEST 1", len( cpp_ray_input ), len( py_ray_input ) )
+for x in range( 0, len( cpp_ray_input ) ):
+    my_assert_equals_close_thrower( "TEST 1." + str( x ), cpp_ray_input[ x ], py_ray_input[ x ] )
+
+#### TEST RES_INPUT ####
+my_assert_equals_thrower( "TEST 2", len( cpp_res_input ), len( py_res_input ) )
+for x in range( 0, len( cpp_res_input ) ):
+    my_assert_equals_close_thrower( "TEST 2." + str( x ), cpp_res_input[ x ], py_res_input[ x ] )
+
+#### TEST OUTPUT ####
+my_assert_equals_thrower( "TEST 3", len( cpp_output ), len( py_output ) )
 for x in range( 0, len( cpp_output ) ):
-    my_assert_equals_close_thrower( "TEST 1." + str( x ), cpp_output[ x ], py_output[ x ] )
+    my_assert_equals_close_thrower( "TEST 3." + str( x ), cpp_output[ x ], py_output[ x ] )
