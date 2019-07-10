@@ -1,3 +1,5 @@
+import jack_mouse_test
+
 import os
 #os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
 #os.environ["CUDA_VISIBLE_DEVICES"] = ""
@@ -200,35 +202,6 @@ def generate_data_from_files( filenames_csv, six_bin ):
         return source_input_no_resid, ray_input_no_resid, output_no_resid
 
 
-#https://towardsdatascience.com/advanced-keras-constructing-complex-custom-losses-and-metrics-c07ca130a618
-def custom_loss():
-    def loss( y_true, y_pred ):
-        #using notation from https://ml-cheatsheet.readthedocs.io/en/latest/loss_functions.html where
-        #p: predicted probability ( 0 to 1 )
-        #y: actual probability ( 0 to 1 )
-        #y_pred: predicted probability (-1 to 1)
-        p=(y_pred + 1)/2
-        if y_true == 1:
-            return -1*K.log( p )
-        else: # y_true == 0
-            return -1*K.log( 1 - p )
-
-    return loss
-
-def loss( y_true, y_pred ):
-    #using notation from https://ml-cheatsheet.readthedocs.io/en/latest/loss_functions.html where
-    #p: predicted probability ( 0 to 1 )
-    #y: actual probability ( 0 to 1 )
-    #y_pred: predicted probability (-1 to 1)
-    p=(y_pred + 1)/2
-    if y_true == 1:
-        return -1*K.log( p )
-    else: # y_true == 0
-        return -1*K.log( 1 - p )
-
-
-tensorflow.keras.losses.custom_loss = custom_loss
-
 #########
 # START #
 #########
@@ -254,7 +227,14 @@ for line in file_lines:
     print( "reading " + str( line ) )
     t0 = time.time()
     try:
-        source_input, ray_input, output = generate_data_from_files( line, False )
+        split = filenames_csv.split( "\n" )[ 0 ].split( "," );
+        my_assert_equals_thrower( "split.length", len( split ), 2 );
+
+        cpp_structs = jack_mouse_test.read_mouse_data( split[ 0 ], split[ 1 ] )
+        source_input = cpp_structs[ 0 ]
+        ray_input = cpp_structs[ 1 ]
+        output = cpp_structs[ 2 ]
+        #source_input, ray_input, output = generate_data_from_files( line, False )
     except AssertError:
         continue
     t1 = time.time()

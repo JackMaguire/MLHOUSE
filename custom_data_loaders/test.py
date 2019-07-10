@@ -185,3 +185,6 @@ for x in range( 0, len( cpp_output ) ):
     my_assert_equals_close_thrower( "TEST 3." + str( x ), len( cpp_output[ x ] ), len( py_output[ x ] ) )
     for y in range( 0, len( cpp_output[ x ] ) ):
         my_assert_equals_close_thrower( "TEST 3." + str( x ) + "." + str( y ), cpp_output[ x ][ y ], py_output[ x ][ y ] )
+
+print( cpp_res_input )
+print( py_res_input )
