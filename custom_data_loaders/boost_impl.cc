@@ -48,9 +48,6 @@ generate_output_data(
   p::tuple shape = p::make_tuple( total_number_of_elements, 1 );
   np::dtype dtype = np::dtype::get_builtin<float>();
   np::ndarray output_values = np::empty( shape, dtype );
-  
-  // p::object tu = p::make_tuple( '1','1','1', std::to_string(total_number_of_elements) );
-  //ndarray output_values( tu );
   float * ndarray_data = reinterpret_cast< float * > ( output_values.get_data() );
 
   for( int i = 0; i < total_number_of_elements; ++i ){
@@ -60,7 +57,6 @@ generate_output_data(
   return output_values;
 }
 
-//ndarray
 std::vector< std::array< std::string, 2 > >
 read_in_output_data(
   std::string const & filename
@@ -80,16 +76,14 @@ read_in_output_data(
     std::stringstream ss( line );
     if ( ! std::getline( ss, new_elements[ 0 ], ',' ) ){
       std::cout << "Error at [0]" << std::endl;
-      // error
-      // TODO - learn how to best handle errors in python
-      continue;//for now, just omit this line
+      throw int( 0 );
+      //continue;//for now, just omit this line
     }
 
     if ( ! std::getline( ss, new_elements[ 1 ], ',' ) ){
       std::cout << "Error at [1]" << std::endl;
-      // error
-      // TODO - learn how to best handle errors in python
-      continue;//for now, just omit this line
+      throw int( 1 );
+      //continue;//for now, just omit this line
     }
 
     //TODO check for third element?
@@ -117,28 +111,6 @@ struct InputElements{
 };
 
 ndarray
-generate_ray_data(
-  std::vector< std::array< float, (18494 - 27) > > const & ray_data
-){
-  int const total_number_of_elements = ray_data.size();
-
-  //https://www.boost.org/doc/libs/1_64_0/libs/python/doc/html/numpy/tutorial/simple.html
-  p::tuple shape = p::make_tuple( total_number_of_elements, (18494 - 27) );
-  np::dtype dtype = np::dtype::get_builtin<float>();
-  np::ndarray ray_values = np::empty( shape, dtype );
-  
-  //TODO this is 2D
-  float * ndarray_data = reinterpret_cast< float * > ( ray_values.get_data() );
-
-  //Let's see how well this gets optimized
-  for( int i = 0; i < total_number_of_elements; ++i ){
-    ndarray_data[ i ] = ray_data[ i ];
-  }
-
-  return ray_values;
-}
-
-ndarray
 generate_residue_data(
   std::vector< std::array< float, 27 > > const & residue_data
 ){
@@ -149,17 +121,38 @@ generate_residue_data(
   np::dtype dtype = np::dtype::get_builtin<float>();
   np::ndarray residue_values = np::empty( shape, dtype );
   
-  //TODO this is 2D
   float * ndarray_data = reinterpret_cast< float * > ( residue_values.get_data() );
 
   //Let's see how well this gets optimized
-  for( int i = 0; i < total_number_of_elements; ++i ){
-    ndarray_data[ i ] = residue_data[ i ];
+  for( int line = 0; line < residue_data.size(); ++line ){
+    for( int i = 0; i < 27; ++i ){
+      ndarray_data[ line * 27 + i ] = residue_data[ line ][ i ];
+    }
   }
 
   return residue_values;
 }
 
+
+ndarray
+generate_ray_data(
+  std::vector< std::array< float, (18494 - 27) > > const & ray_data
+){
+  //https://www.boost.org/doc/libs/1_64_0/libs/python/doc/html/numpy/tutorial/simple.html
+  p::tuple shape = p::make_tuple( ray_data.size(), (18494 - 27) );
+  np::dtype dtype = np::dtype::get_builtin<float>();
+  np::ndarray ray_values = np::empty( shape, dtype );
+  float * ndarray_data = reinterpret_cast< float * > ( ray_values.get_data() );
+
+  //Let's see how well this gets optimized
+  for( int line = 0; line < ray_data.size(); ++line ){
+    for( int ray = 0; ray < (18494 - 27); ++ray ){
+      ndarray_data[ line * (18494 - 27) + ray ] = ray_data[ line ][ ray ];
+    }
+  }
+
+  return ray_values;
+}
 
 InputElements
 read_in_input_data(
@@ -172,8 +165,6 @@ read_in_input_data(
 
   while( std::getline( infile, line ) ) {
 
-    tokens.reserve( 18495 );
-
     std::array< std::string, 18495 > tokens;
     //Caching strings here
     //We don't want to add the values to "elements"
@@ -181,20 +172,19 @@ read_in_input_data(
 
     std::string dummy;
     std::stringstream ss( line );
-    bad=false;
+    //bool bad = false;
     for( unsigned int i = 0; i < 18495; ++i ){
       if ( ! std::getline( ss, dummy, ',' ) ){
 	std::cout << "Error at [0]" << std::endl;
-	// error
-	// TODO - learn how to best handle errors in python
-	bad=true;
-	break;//for now, just omit this line
+	throw int( 2 );
+	//bad=true;
+	//break;//for now, just omit this line
       }
 
       tokens[ i ] = dummy;
     }
 
-    if( bad ) continue;
+    //if( bad ) continue;
 
     unsigned int const index = elements.next_index();
     elements.resids[ index ] = tokens[ 0 ];
@@ -215,18 +205,26 @@ read_in_input_data(
 }
 
 
+
 //ndarray
 boost::python::tuple
 read_mouse_data(
   std::string const & input_data_filename,
   std::string const & output_data_filename
 ) {
-  InputElements const input_elements = read_in_input_data( input_data_filename );
+  try {
+    InputElements const input_elements = read_in_input_data( input_data_filename );
+    auto const residue_data = generate_residue_data( input_elements.residue_data );
+    auto const ray_data = generate_ray_data( input_elements.ray_data );
 
-  auto const tokenized_file_lines_of_output_file = read_in_output_data( output_data_filename );
-  auto const output_data = generate_output_data( tokenized_file_lines_of_output_file );
+    auto const tokenized_file_lines_of_output_file = read_in_output_data( output_data_filename );
+    auto const output_data = generate_output_data( tokenized_file_lines_of_output_file );
 
-  return boost::python::make_tuple( output_data );
+    return boost::python::make_tuple( residue_data, ray_data, output_data );
+  } catch ( int error_no ){
+    std::cerr << "Caught exception #" << error_no << std::endl;
+    return boost::python::make_tuple( error_no );
+  }
 }
 
 } //namespace mouse_io

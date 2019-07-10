@@ -144,11 +144,19 @@ def generate_data_from_files( input_filename, output_filename, six_bin ):
 
 
 t0 = time.time()
-cpp_structs = jack_mouse_test.read_mouse_data( output_file_path )
-cpp_output = cpp_structs[ 0 ]
+cpp_structs = jack_mouse_test.read_mouse_data( input_file_path, output_file_path )
 t1 = time.time()
 py_source_input, py_ray_input, py_output = generate_data_from_files( input_file_path, output_file_path, False )
 t2 = time.time()
+
+if( len( cpp_structs ) < 3 ):
+    print( "CPP found an exception" )
+    exit( cpp_structs[ 0 ] )
+res_input = cpp_structs[ 0 ]
+ray_input = cpp_structs[ 1 ]
+cpp_output = cpp_structs[ 2 ]
+
+
 #print( cpp_output.shape )
 #print( py_output.shape )
 #exit( 0 )
