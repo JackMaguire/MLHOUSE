@@ -39,7 +39,7 @@ mv next curr
 for epoch in {0..1000}; do
 
     cd $workdir
-    if [ -f epoch_${epoch}.1.h5 ]; then
+    if ls epoch_${epoch}.*.h5 1>/dev/null 2>/dev/null; then
 	echo "Skipping epoch $epoch"
 	for y in epoch_$epoch.*.h5; do
 	    cp $y `echo $y | sed "s/epoch_$epoch/current/g"`

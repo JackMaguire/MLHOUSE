@@ -121,7 +121,7 @@ def generate_data_from_files( filenames_csv, six_bin ):
     split = filenames_csv.split( "\n" )[ 0 ].split( "," );
     my_assert_equals_thrower( "split.length", len( split ), 2 );
 
-    t0 = time.time()
+    #t0 = time.time()
 
     # Both of these elements lead with a dummy
     if split[ 0 ].endswith( ".csv.gz" ):
@@ -225,11 +225,11 @@ shuffle( file_lines )
 
 for line in file_lines:
     print( "reading " + str( line ) )
+    split = line.split( "\n" )[ 0 ].split( "," );
+    my_assert_equals_thrower( "split.length", len( split ), 2 );
+
     t0 = time.time()
     try:
-        split = filenames_csv.split( "\n" )[ 0 ].split( "," );
-        my_assert_equals_thrower( "split.length", len( split ), 2 );
-
         cpp_structs = jack_mouse_test.read_mouse_data( split[ 0 ], split[ 1 ] )
         source_input = cpp_structs[ 0 ]
         ray_input = cpp_structs[ 1 ]
