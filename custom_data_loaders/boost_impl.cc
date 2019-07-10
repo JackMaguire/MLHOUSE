@@ -204,9 +204,23 @@ read_in_input_data(
   return elements;
 }
 
+void
+assert_resids_line_up(
+  std::vector< std::string > input_resids,
+  std::vector< std::array< std::string, 2 > > const & tokenized_file_lines_of_output_file
+) {
+  if( input_resids.size() != tokenized_file_lines_of_output_file.size() ){
+    throw int( 4 );
+  }
+
+  for( unsigned i = 0; i < input_resids.size(); ++i ){
+    if( input_resids[ i ] != tokenized_file_lines_of_output_file[ i ][ 0 ] ){
+      throw int( 1000 + i );
+    }
+  }
+}
 
 
-//ndarray
 boost::python::tuple
 read_mouse_data(
   std::string const & input_data_filename,
@@ -219,6 +233,8 @@ read_mouse_data(
 
     auto const tokenized_file_lines_of_output_file = read_in_output_data( output_data_filename );
     auto const output_data = generate_output_data( tokenized_file_lines_of_output_file );
+
+    assert_resids_line_up( input_elements.resids, tokenized_file_lines_of_output_file );
 
     return boost::python::make_tuple( residue_data, ray_data, output_data );
   } catch ( int error_no ){
