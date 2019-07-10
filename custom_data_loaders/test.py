@@ -146,7 +146,7 @@ def generate_data_from_files( input_filename, output_filename, six_bin ):
 t0 = time.time()
 cpp_structs = jack_mouse_test.read_mouse_data( input_file_path, output_file_path )
 t1 = time.time()
-py_source_input, py_ray_input, py_output = generate_data_from_files( input_file_path, output_file_path, False )
+py_res_input, py_ray_input, py_output = generate_data_from_files( input_file_path, output_file_path, False )
 t2 = time.time()
 
 if( len( cpp_structs ) < 3 ):
@@ -168,14 +168,20 @@ print( "Ratio: " + str( (t2 - t1) / (t1 - t0) ) )
 #### TEST RAY_INPUT ####
 my_assert_equals_thrower( "TEST 1", len( cpp_ray_input ), len( py_ray_input ) )
 for x in range( 0, len( cpp_ray_input ) ):
-    my_assert_equals_close_thrower( "TEST 1." + str( x ), cpp_ray_input[ x ], py_ray_input[ x ] )
+    my_assert_equals_close_thrower( "TEST 1." + str( x ), len( cpp_ray_input[ x ] ), len( py_ray_input[ x ] ) )
+    for y in range( 0, len( cpp_ray_input[ x ] ) ):
+        my_assert_equals_close_thrower( "TEST 1." + str( x ) + "." + str( y ), cpp_ray_input[ x ][ y ], py_ray_input[ x ][ y ] )
 
 #### TEST RES_INPUT ####
 my_assert_equals_thrower( "TEST 2", len( cpp_res_input ), len( py_res_input ) )
 for x in range( 0, len( cpp_res_input ) ):
-    my_assert_equals_close_thrower( "TEST 2." + str( x ), cpp_res_input[ x ], py_res_input[ x ] )
+    my_assert_equals_close_thrower( "TEST 2." + str( x ), len( cpp_res_input[ x ] ), len( py_res_input[ x ] ) )
+    for y in range( 0, len( cpp_res_input[ x ] ) ):
+        my_assert_equals_close_thrower( "TEST 2." + str( x ) + "." + str( y ), cpp_res_input[ x ][ y ], py_res_input[ x ][ y ] )
 
 #### TEST OUTPUT ####
 my_assert_equals_thrower( "TEST 3", len( cpp_output ), len( py_output ) )
 for x in range( 0, len( cpp_output ) ):
-    my_assert_equals_close_thrower( "TEST 3." + str( x ), cpp_output[ x ], py_output[ x ] )
+    my_assert_equals_close_thrower( "TEST 3." + str( x ), len( cpp_output[ x ] ), len( py_output[ x ] ) )
+    for y in range( 0, len( cpp_output[ x ] ) ):
+        my_assert_equals_close_thrower( "TEST 3." + str( x ) + "." + str( y ), cpp_output[ x ][ y ], py_output[ x ][ y ] )
