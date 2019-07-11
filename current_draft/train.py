@@ -206,25 +206,11 @@ def generate_data_from_files( filenames_csv, six_bin ):
 # START #
 #########
 
-model_array = []
-
-str_array = [
-    "advanced2.5C.5L.5D.value",
-    "advanced2.5C.5L.10D.value",
-    "advanced2.5C.5L.5D.4x3.value",
-    "advanced2.5C.5L.10D.4.xvalue",
-]
-
-#sadly, the only way I know how to resize
-model_array = str_array
-
-for i in range( 0, len( str_array ) ):
-    my_str = str_array[ i ];
-    if os.path.isfile( "../current." + my_str + ".h5" ):
-        model_array[ i ] = load_model( "../current." + my_str + ".h5" )
-    else:
-        print( "Model ../current." + my_str + ".h5 is not a file" )
-        exit( 1 )
+if os.path.isfile( "../current.advanced2.5C.5L.5D.value.h5" ):
+    model1 = load_model( "../current.advanced2.5C.5L.5D.value.h5" )
+else:
+    print( "Model ../current.advanced2.5C.5L.5D.value.h5 is not a file" )
+    exit( 1 )
 
 # 4) Fit Model
 
@@ -255,8 +241,7 @@ for line in file_lines:
     #submitting in batches to save memory on the GPU
     #64 works, 128 is too large
     #model1.train_on_batch( x=[source_input,ray_input], y=output )
-    for model in model_array:
-        model.fit( x=[source_input,ray_input], y=output, epochs=1, batch_size=64 )
+    model1.fit( x=[source_input,ray_input], y=output, epochs=1, batch_size=64 )
     t2 = time.time()
     time_spent_loading += t1 - t0
     time_spent_training += t2 - t1
@@ -265,7 +250,5 @@ print( str( float( time_spent_loading ) / float(time_spent_loading + time_spent_
 print( time_spent_loading )
 print( time_spent_training )
 
-for i in range( 0, len( str_array ) ):
-    my_str = str_array[ i ]
-    model_array[ i ].save( "final." + my_str + ".h5" )
+model1.save( "final.advanced2.5C.5L.5D.value.h5" )
 
