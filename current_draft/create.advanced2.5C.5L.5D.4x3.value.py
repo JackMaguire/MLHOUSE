@@ -63,9 +63,9 @@ E = Conv2D( name="layerE", filters=30, kernel_size=(1,1), padding='valid', input
 
 
 # Phase 2: FGHIJ
-F = LocallyConnected2D( name="layerF", filters=30, kernel_size=(4,3), padding='valid', input_shape=(36, 19, 30), data_format='channels_last', activation='relu', use_bias=True )( E )
-G = LocallyConnected2D( name="layerG", filters=25, kernel_size=(4,3), padding='valid', input_shape=(33, 17, 30), data_format='channels_last', activation='relu', use_bias=True )( F )
-H = LocallyConnected2D( name="layerH", filters=20, kernel_size=(4,3), padding='valid', input_shape=(30, 15, 25), data_format='channels_last', activation='relu', use_bias=True )( G )
+F = LocallyConnected2D( name="layerF", filters=20, kernel_size=(4,3), padding='valid', input_shape=(36, 19, 30), data_format='channels_last', activation='relu', use_bias=True )( E )
+G = LocallyConnected2D( name="layerG", filters=20, kernel_size=(4,3), padding='valid', input_shape=(33, 17, 20), data_format='channels_last', activation='relu', use_bias=True )( F )
+H = LocallyConnected2D( name="layerH", filters=20, kernel_size=(4,3), padding='valid', input_shape=(30, 15, 20), data_format='channels_last', activation='relu', use_bias=True )( G )
 I = LocallyConnected2D( name="layerI", filters=15, kernel_size=(4,3), padding='valid', input_shape=(27, 13, 20), data_format='channels_last', activation='relu', use_bias=True )( H )
 J = LocallyConnected2D( name="layerJ", filters=10, kernel_size=(4,3), padding='valid', input_shape=(24, 11, 15), data_format='channels_last', activation='relu', use_bias=True )( I )
 
