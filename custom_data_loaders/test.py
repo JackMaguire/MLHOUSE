@@ -134,7 +134,7 @@ def generate_data_from_files( input_filename, output_filename, six_bin ):
             val = output_no_resid[x][0]
             #Stunt large values
             if( val > 1 ):
-                val = math.sqrt( val )
+                val = val ** 0.75
             #subtract mean of -2:
             val += 2.0
             #divide by span of 3:

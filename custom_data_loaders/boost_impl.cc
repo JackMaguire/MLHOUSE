@@ -1,6 +1,7 @@
 #include <boost/python.hpp>
 #include <boost/python/numpy.hpp>
 
+#include <cmath>
 #include <math.h>
 #include <fstream>
 #include <sstream>
@@ -26,7 +27,8 @@ normalize_output_value(
   float value
 ){
   if( value > 1 ){
-    value = sqrt( value );
+    //value = sqrt( value );
+    value = pow( value, 0.75 );
   }
   value += 2.0;
   value /= 3.0;
