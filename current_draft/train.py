@@ -212,7 +212,7 @@ str_array = [
     "advanced2.5C.5L.5D.value",
     "advanced2.5C.5L.10D.value",
     "advanced2.5C.5L.5D.4x3.value",
-    "advanced2.5C.5L.10D.4x3.value",
+    "advanced2.5C.5L.10D.4.xvalue",
 ]
 
 #sadly, the only way I know how to resize
