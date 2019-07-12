@@ -39,7 +39,7 @@ import subprocess
 numpy.random.seed( 0 )
 
 parser = argparse.ArgumentParser()
-parser.add_argument( "--model", help="filename for output file", default="start.advanced3.5C.5L.5D.value", required=False )
+parser.add_argument( "--model", help="filename for output file", default="start.advanced3.5C.5L.5D.value.too_many_concats", required=False )
 args = parser.parse_args()
 
 num_input_dimensions1 = 26

@@ -50,24 +50,21 @@ input1 = Input(shape=(num_input_dimensions1,), name="in1", dtype="float32" )
 input2 = Input(shape=(18468,), name="in2", dtype="float32" )
 
 # Phase 1: in2 -> ABCDE
-
 pre = Reshape( target_shape=(36, 19, 27,) )( input2 )#ALWAYS DO WIDTH, HEIGHT, CHANNELS
-A = Conv2D( name="layerA", filters=30, kernel_size=(1,1), padding='valid', input_shape=(36, 19, 27), data_format='channels_last', activation='relu', use_bias=True )( pre )
-B = Conv2D( name="layerB", filters=30, kernel_size=(1,1), padding='valid', input_shape=(36, 19, 30), data_format='channels_last', activation='relu', use_bias=True )( A )
-#C = LocallyConnected2D( name="layerC", filters=25, kernel_size=(1,1), padding='valid', input_shape=(36, 19, 30), data_format='channels_last', activation='relu', use_bias=True )( B )
-C = Conv2D( name="layerC", filters=30, kernel_size=(1,1), padding='valid', input_shape=(36, 19, 30), data_format='channels_last', activation='relu', use_bias=True )( B )
-#D = LocallyConnected2D( name="layerD", filters=20, kernel_size=(1,1), padding='valid', input_shape=(36, 19, 25), data_format='channels_last', activation='relu', use_bias=True )( C )
-D = Conv2D( name="layerD", filters=30, kernel_size=(1,1), padding='valid', input_shape=(36, 19, 30), data_format='channels_last', activation='relu', use_bias=True )( C )
-#E = LocallyConnected2D( name="layerE", filters=15, kernel_size=(1,1), padding='valid', input_shape=(36, 19, 20), data_format='channels_last', activation='relu', use_bias=True )( D )
-E = Conv2D( name="layerE", filters=30, kernel_size=(1,1), padding='valid', input_shape=(36, 19, 30), data_format='channels_last', activation='relu', use_bias=True )( D )
+A = Conv2D( name="layerA", filters=30, kernel_size=(1,1), padding='valid', input_shape=pre.shape, data_format='channels_last', activation='relu', use_bias=True )( pre )
+B = Conv2D( name="layerB", filters=30, kernel_size=(1,1), padding='valid', input_shape=A.shape, data_format='channels_last', activation='relu', use_bias=True )( A )
+C = Conv2D( name="layerC", filters=30, kernel_size=(1,1), padding='valid', input_shape=B.shape, data_format='channels_last', activation='relu', use_bias=True )( B )
+D = Conv2D( name="layerD", filters=30, kernel_size=(1,1), padding='valid', input_shape=C.shape, data_format='channels_last', activation='relu', use_bias=True )( C )
+E = Conv2D( name="layerE", filters=30, kernel_size=(1,1), padding='valid', input_shape=D.shape, data_format='channels_last', activation='relu', use_bias=True )( D )
 
 
 # Phase 2: FGHIJ
-F = LocallyConnected2D( name="layerF", filters=20, kernel_size=(4,3), padding='valid', input_shape=(36, 19, 30), data_format='channels_last', activation='relu', use_bias=True )( E )
-G = LocallyConnected2D( name="layerG", filters=20, kernel_size=(4,3), padding='valid', input_shape=(33, 17, 20), data_format='channels_last', activation='relu', use_bias=True )( F )
-H = LocallyConnected2D( name="layerH", filters=20, kernel_size=(4,3), padding='valid', input_shape=(30, 15, 20), data_format='channels_last', activation='relu', use_bias=True )( G )
-I = LocallyConnected2D( name="layerI", filters=15, kernel_size=(4,3), padding='valid', input_shape=(27, 13, 20), data_format='channels_last', activation='relu', use_bias=True )( H )
-J = LocallyConnected2D( name="layerJ", filters=10, kernel_size=(4,3), padding='valid', input_shape=(24, 11, 15), data_format='channels_last', activation='relu', use_bias=True )( I )
+F = LocallyConnected2D( name="layerF", filters=20, kernel_size=(4,3), padding='valid', input_shape=E.shape, data_format='channels_last', activation='relu', use_bias=True )( E )
+G = LocallyConnected2D( name="layerG", filters=20, kernel_size=(4,3), padding='valid', input_shape=F.shape, data_format='channels_last', activation='relu', use_bias=True )( F )
+H = LocallyConnected2D( name="layerH", filters=20, kernel_size=(4,3), padding='valid', input_shape=G.shape, data_format='channels_last', activation='relu', use_bias=True )( G )
+I = LocallyConnected2D( name="layerI", filters=15, kernel_size=(4,3), padding='valid', input_shape=H.shape, data_format='channels_last', activation='relu', use_bias=True )( H )
+J = LocallyConnected2D( name="layerJ", filters=10, kernel_size=(4,3), padding='valid', input_shape=I.shape, data_format='channels_last', activation='relu', use_bias=True )( I )
+
 
 # Phase 3: flatJ, merge, KLMN, output
 flatJ = Flatten( name="flatJ", data_format='channels_last' )( J )
