@@ -1,8 +1,8 @@
-import jack_mouse_test
+#import jack_mouse_test
 
 import os
-#os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
-#os.environ["CUDA_VISIBLE_DEVICES"] = ""
+os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
+os.environ["CUDA_VISIBLE_DEVICES"] = ""
 
 from random import shuffle
 
@@ -34,13 +34,16 @@ import random
 import time
 import subprocess
 
+import scipy
+import scipy.stats
+
 #from tensorflow.python.client import device_lib
 #print(device_lib.list_local_devices())
 
 import tensorflow as tf
 #from tensorflow.keras.backend.tensorflow_backend import set_session
 
-
+'''
 #Only use part of the GPU, from https://github.com/keras-team/keras/issues/4161
 config = tf.ConfigProto()
 config.gpu_options.allow_growth = True  # dynamically grow the memory used on the GPU
@@ -51,6 +54,7 @@ config.log_device_placement = True  # to log device placement (on which device t
 sess = tf.Session(config=config)
 set_session(sess)  # set this TensorFlow session as the default session for Keras
 
+'''
 
 ########
 # INIT #
@@ -71,10 +75,10 @@ numpy.random.seed( 0 )
 
 parser = argparse.ArgumentParser()
 
-#parser.add_argument( "--model", help="Most recent model file", required=True )
+parser.add_argument( "--model", help="Most recent model file", required=True )
 
-parser.add_argument( "--training_data", help="CSV where each line has two elements. First element is the absolute path to the input csv file, second element is the absolute path to the corresponding output csv file.", required=True )
-# Example: "--training_data foo.csv" where foo.csv looks like:
+parser.add_argument( "--data", help="CSV where each line has two elements. First element is the absolute path to the input csv file, second element is the absolute path to the corresponding output csv file.", required=True )
+# Example: "--data foo.csv" where foo.csv looks like:
 # /home/jack/input.1.csv,/home/jack/output.1.csv
 # /home/jack/input.2.csv,/home/jack/output.2.csv
 # /home/jack/input.3.csv,/home/jack/output.3.csv
@@ -85,6 +89,23 @@ args = parser.parse_args()
 #########
 # FUNCS #
 #########
+
+def hello_world():
+    x1 = [ 1., 2., 4. ]
+    y1 = [ 2., 4., 6. ]
+
+    x2 = [ 1., 2., 4. ]
+    y2 = [ 0., 3., 3. ]
+
+    print( scipy.stats.pearsonr( x1, y1 )[ 0 ] )
+    print( scipy.stats.pearsonr( x2, y2 )[ 0 ] )
+
+    print( scipy.stats.spearmanr( x1, y1 ).correlation )
+    print( scipy.stats.spearmanr( x2, y2 ).correlation )
+
+    print( scipy.stats.kendalltau( x1, y1 ).correlation )
+    print( scipy.stats.kendalltau( x2, y2 ).correlation )
+
 
 def my_assert_equals( name, actual, theoretical ):
     if actual != theoretical:
@@ -206,15 +227,32 @@ def generate_data_from_files( filenames_csv, six_bin ):
 # START #
 #########
 
-if os.path.isfile( "../current.advanced2.5C.5L.5D.value.h5" ):
-    model1 = load_model( "../current.advanced2.5C.5L.5D.value.h5" )
+if os.path.isfile( args.model ):
+    model = load_model( args.model )
 else:
-    print( "Model ../current.advanced2.5C.5L.5D.value.h5 is not a file" )
+    print( "Model " + args.model + " is not a file" )
     exit( 1 )
 
+allxs = []
+allys = []
+
+xs_lt_0 = []
+ys_lt_0 = []
+
+xs_lt_n2 = []
+ys_lt_n2 = []
+
+xs_lt_n4 = []
+ys_lt_n4 = []
+
+xs_lt_n6 = []
+ys_lt_n6 = []
+
+
+'''
 # 4) Fit Model
 
-with open( args.training_data, "r" ) as f:
+with open( args.data, "r" ) as f:
     file_lines = f.readlines()
 num_file_lines = len( file_lines )
 
@@ -250,5 +288,4 @@ print( str( float( time_spent_loading ) / float(time_spent_loading + time_spent_
 print( time_spent_loading )
 print( time_spent_training )
 
-model1.save( "final.advanced2.5C.5L.5D.value.h5" )
-
+'''
