@@ -2,7 +2,7 @@
 
 #requires sudo apt-get install libboost-all-dev
 
-WARN='-pedantic -Wall -Wextra'
+WARN='-pedantic -Wall -Wextra -Wshadow -Wunused -Wuninitialized'
 
 name=jack_mouse_test
 
