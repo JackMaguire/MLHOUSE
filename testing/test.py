@@ -40,7 +40,7 @@ import subprocess
 import tensorflow as tf
 #from tensorflow.keras.backend.tensorflow_backend import set_session
 
-'''
+
 #Only use part of the GPU, from https://github.com/keras-team/keras/issues/4161
 config = tf.ConfigProto()
 config.gpu_options.allow_growth = True  # dynamically grow the memory used on the GPU
@@ -50,7 +50,7 @@ config.log_device_placement = True  # to log device placement (on which device t
                                     # (nothing gets printed in Jupyter, only if you run it standalone)
 sess = tf.Session(config=config)
 set_session(sess)  # set this TensorFlow session as the default session for Keras
-'''
+
 
 ########
 # INIT #
@@ -194,7 +194,7 @@ def generate_data_from_files( filenames_csv, six_bin ):
             val = output_no_resid[x][0]
             #Stunt large values
             if( val > 1 ):
-                val = val ** 0.75
+                val = val**0.75
             #subtract mean of -2:
             val += 2.0
             #divide by span of 3:
