@@ -123,7 +123,7 @@ generate_residue_data(
   float * ndarray_data = reinterpret_cast< float * > ( residue_values.get_data() );
 
   //Let's see how well this gets optimized
-  for( int line = 0; line < residue_data.size(); ++line ){
+  for( uint line = 0; line < residue_data.size(); ++line ){
     for( int i = 0; i < 26; ++i ){
       ndarray_data[ line * 26 + i ] = residue_data[ line ][ i ];
     }
@@ -144,7 +144,7 @@ generate_ray_data(
   float * ndarray_data = reinterpret_cast< float * > ( ray_values.get_data() );
 
   //Let's see how well this gets optimized
-  for( int line = 0; line < ray_data.size(); ++line ){
+  for( uint line = 0; line < ray_data.size(); ++line ){
     for( int ray = 0; ray < 18468; ++ray ){
       ndarray_data[ line * 18468 + ray ] = ray_data[ line ][ ray ];
     }
