@@ -22,6 +22,8 @@ namespace np = boost::python::numpy;
 
 namespace mouse_io {
 
+namespace {
+
 float
 normalize_output_value(
   float value
@@ -48,7 +50,7 @@ generate_output_data(
   float * ndarray_data = reinterpret_cast< float * > ( output_values.get_data() );
 
   for( int i = 0; i < total_number_of_elements; ++i ){
-    ndarray_data[ i ] = std::stof( tokenized_file_lines_of_output_file[ i ][ 1 ] );
+    ndarray_data[ i ] = normalize_output_value( std::stof( tokenized_file_lines_of_output_file[ i ][ 1 ] ) );
   }
 
   return output_values;
@@ -217,6 +219,7 @@ assert_resids_line_up(
   }
 }
 
+} // anonymous namespace
 
 boost::python::tuple
 read_mouse_data(
