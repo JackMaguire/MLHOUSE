@@ -249,43 +249,27 @@ xs_lt_n6 = []
 ys_lt_n6 = []
 
 
-'''
+
 # 4) Fit Model
 
 with open( args.data, "r" ) as f:
     file_lines = f.readlines()
-num_file_lines = len( file_lines )
-
-time_spent_loading = float( 0 )
-time_spent_training = float( 0 )
-
-shuffle( file_lines )
 
 for line in file_lines:
-    print( "reading " + str( line ) )
-    split = line.split( "\n" )[ 0 ].split( "," );
-    my_assert_equals_thrower( "split.length", len( split ), 2 );
+    #print( "reading " + str( line ) )
+    #split = line.split( "\n" )[ 0 ].split( "," );
+    #my_assert_equals_thrower( "split.length", len( split ), 2 );
 
-    t0 = time.time()
     try:
-        cpp_structs = jack_mouse_test.read_mouse_data( split[ 0 ], split[ 1 ] )
-        source_input = cpp_structs[ 0 ]
-        ray_input = cpp_structs[ 1 ]
-        output = cpp_structs[ 2 ]
-        #source_input, ray_input, output = generate_data_from_files( line, False )
+        #cpp_structs = jack_mouse_test.read_mouse_data( split[ 0 ], split[ 1 ] )
+        #source_input = cpp_structs[ 0 ]
+        #ray_input = cpp_structs[ 1 ]
+        #output = cpp_structs[ 2 ]
+        source_input, ray_input, output = generate_data_from_files( line, False )
     except AssertError:
         continue
-    t1 = time.time()
-    #submitting in batches to save memory on the GPU
-    #64 works, 128 is too large
-    #model1.train_on_batch( x=[source_input,ray_input], y=output )
-    model1.fit( x=[source_input,ray_input], y=output, epochs=1, batch_size=64 )
-    t2 = time.time()
-    time_spent_loading += t1 - t0
-    time_spent_training += t2 - t1
-
-print( str( float( time_spent_loading ) / float(time_spent_loading + time_spent_training) ) + " fraction of time was spent loading" )
-print( time_spent_loading )
-print( time_spent_training )
-
-'''
+    predictions = model.predict( x=[source_input,ray_input] )
+    my_assert_equals_thrower( "len( predictions )", len( predictions ), len( output ) );
+    print( predictions[ 0 ].shape )
+    print( output[ 0 ].shape )
+    exit( 0 )
