@@ -77,8 +77,6 @@ O = LocallyConnected2D( name="layerO", filters=5, kernel_size=(3,2), padding='va
 
 # Phase 3: flatJ, merge, KLMN, output
 flat = Flatten( name="flat", data_format='channels_last' )( O )
-#print( flatJ.shape )
-#exit( 1 )
  
 dense1 = Dense( name="dense1", units=400, activation='relu' )( flat )
 dense2 = Dense( name="dense2", units=300, activation='relu' )( dense1 )
