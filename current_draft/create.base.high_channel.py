@@ -46,8 +46,9 @@ args = parser.parse_args()
 num_input_dimensions1 = 26
 num_input_dimensions2 = 18494 - num_input_dimensions1
 
-input1 = Input(shape=(1,1,num_input_dimensions1,), name="in1", dtype="float32" )
-in1up = UpSampling3D( size=(36,19,1), data_format='channels_last' )( input1 )
+input1 = Input(shape=(num_input_dimensions1,), name="in1", dtype="float32" )
+pre1 = Reshape( target_shape=(1,1,num_input_dimensions1,) )( input1 )#ALWAYS DO WIDTH, HEIGHT, CHANNELS
+in1up = UpSampling3D( size=(36,19,1), data_format='channels_last' )( pre1 )
 
 
 #input2 = Input(shape=(36, 19, 27,), name="in2", dtype="float32" )
