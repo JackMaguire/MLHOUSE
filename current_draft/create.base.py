@@ -44,15 +44,17 @@ args = parser.parse_args()
 num_input_dimensions1 = 26
 num_input_dimensions2 = 18494 - num_input_dimensions1
 
-input1 = Input(shape=(num_input_dimensions1,), name="in1", dtype="float32" )
-in1_A = Dense( name="in1_A", units=50, activation='relu' )( input1 )
+input1 = Input(shape=(1,1,num_input_dimensions1,), name="in1", dtype="float32" )
+flatin1 = Flatten( name="flatin1", data_format='channels_last' )( input1 )
+
+in1_A = Dense( name="in1_A", units=50, activation='relu' )( flatin1 )
 in1_B = Dense( name="in1_B", units=50, activation='relu' )( in1_A )
 in1_C = Dense( name="in1_C", units=50, activation='relu' )( in1_B )
 in1_D = Dense( name="in1_D", units=50, activation='relu' )( in1_C )
 
 
 #input2 = Input(shape=(36, 19, 27,), name="in2", dtype="float32" )
-input2 = Input(shape=(18468,), name="in2", dtype="float32" )
+input2 = Input(shape=(num_input_dimensions2,), name="in2", dtype="float32" )
 
 # Phase 1: in2 -> ABCDE
 pre = Reshape( target_shape=(36, 19, 27,) )( input2 )#ALWAYS DO WIDTH, HEIGHT, CHANNELS
