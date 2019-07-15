@@ -1,8 +1,8 @@
-#import jack_mouse_test
+import jack_mouse_test
 
 import os
-os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
-os.environ["CUDA_VISIBLE_DEVICES"] = ""
+#os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
+#os.environ["CUDA_VISIBLE_DEVICES"] = ""
 
 from random import shuffle
 
@@ -264,20 +264,28 @@ with open( args.data, "r" ) as f:
 
 for line in file_lines:
     #print( "reading " + str( line ) )
-    #split = line.split( "\n" )[ 0 ].split( "," );
-    #my_assert_equals_thrower( "split.length", len( split ), 2 );
+    split = line.split( "\n" )[ 0 ].split( "," );
+    my_assert_equals_thrower( "split.length", len( split ), 2 );
 
     try:
-        #cpp_structs = jack_mouse_test.read_mouse_data( split[ 0 ], split[ 1 ] )
-        #source_input = cpp_structs[ 0 ]
-        #ray_input = cpp_structs[ 1 ]
-        #output = cpp_structs[ 2 ]
-        source_input, ray_input, output = generate_data_from_files( line, False )
+        cpp_structs = jack_mouse_test.read_mouse_data( split[ 0 ], split[ 1 ] )
+        source_input = cpp_structs[ 0 ]
+        ray_input = cpp_structs[ 1 ]
+        output = cpp_structs[ 2 ]
+        #source_input, ray_input, output = generate_data_from_files( line, False )
     except AssertError:
         continue
     predictions = model.predict( x=[source_input,ray_input] )
     my_assert_equals_thrower( "len( predictions )", len( predictions ), len( output ) );
     for i in range( 0, len( predictions ) ):
+        '''
+        denorm_val=output[ i ][ 0 ]
+        norm_val = denorm_val
+        if norm_val > 1:
+            norm_val = norm_val**0.75
+        norm_val += 2.0
+        norm_val /= 3.0
+        '''
         norm_val=output[ i ][ 0 ]
         denorm_val = (norm_val*3.0)-2.0
         if denorm_val > 1.0:
@@ -287,6 +295,8 @@ for line in file_lines:
         denorm_pred = (norm_pred*3.0)-2.0
         if denorm_pred > 1.0:
             denorm_pred**(1.0/0.75)
+
+        #print( norm_val, denorm_val, norm_pred, denorm_pred )
 
         mse_pre_denorm += (norm_val-norm_pred)**2
         denorm_mse = (denorm_val-denorm_pred)**2
