@@ -40,7 +40,7 @@ import subprocess
 numpy.random.seed( 0 )
 
 parser = argparse.ArgumentParser()
-parser.add_argument( "--model", help="filename for output file", default="start.base.high_channel.small", required=False )
+parser.add_argument( "--model", help="filename for output file", default="start.base.high_channel.smaller", required=False )
 args = parser.parse_args()
 
 num_input_dimensions1 = 26
@@ -64,15 +64,16 @@ merge = tensorflow.keras.layers.concatenate( [B,in1up], name="merge", axis=-1 )
 C = LocallyConnected2D( name="layerC", filters=15, kernel_size=(1,1), strides=(1,1), padding='valid', data_format='channels_last', activation='relu', use_bias=True )( merge )
 D = LocallyConnected2D( name="layerD", filters=10, kernel_size=(1,1), strides=(1,1), padding='valid', data_format='channels_last', activation='relu', use_bias=True )( C )
 E = LocallyConnected2D( name="layerE", filters=5, kernel_size=(1,1), strides=(1,1), padding='valid', data_format='channels_last', activation='relu', use_bias=True )( D )
+
 print( E.shape )
-F = LocallyConnected2D( name="layerF", filters=15, kernel_size=(2,3), strides=(2,1), padding='valid', data_format='channels_last', activation='relu', use_bias=True )( E )
-print( F.shape ) #17x17
-#exit( 0 )
-G = LocallyConnected2D( name="layerG", filters=15, kernel_size=(4,3), strides=(2,2), padding='valid', data_format='channels_last', activation='relu', use_bias=True )( F )
+F = LocallyConnected2D( name="layerF", filters=15, kernel_size=(6,4), strides=(3,3), padding='valid', data_format='channels_last', activation='relu', use_bias=True )( E )
+print( F.shape )
+G = LocallyConnected2D( name="layerG", filters=15, kernel_size=(3,4), strides=(2,2), padding='valid', data_format='channels_last', activation='relu', use_bias=True )( F )
 print( G.shape )
+#exit( 0 )
 flat = Flatten( name="flat", data_format='channels_last' )( G )
  
-dense1 = Dense( name="dense1", units=100, activation='relu' )( flat )
+dense1 = Dense( name="dense1", units=50, activation='relu' )( flat )
 dense2 = Dense( name="dense2", units=50, activation='relu' )( dense1 )
 dense3 = Dense( name="dense3", units=50, activation='relu' )( dense2 )
 dense4 = Dense( name="dense4", units=50, activation='relu' )( dense3 )
