@@ -30,9 +30,16 @@ if [[ $command -eq 1 ]]; then
 else
     #run on current dir
     cd curr
-    for x in ../sub_trains/*.py; do
-	( python3 $x --training_data local_list.csv 2>/dev/null | tail -n 3 | head -n 1 ) || ( echo $x went bad && exit 1 )
-    done
+    if false; then
+	head -n10 local_list.csv > local_list.10.csv
+	for x in ../sub_trains/*.py; do
+	    ( python3 $x --training_data local_list.10.csv 2>/dev/null | tail -n 3 | head -n 1 ) || ( echo $x went bad && exit 1 )
+	done
+    else
+	for x in ../sub_trains/*.py; do
+	    ( python3 $x --training_data local_list.csv 2>/dev/null | tail -n 3 | head -n 1 ) || ( echo $x went bad && exit 1 )
+	done
+    fi
     #python3 ../train.py --training_data local_list.csv 2>/dev/null | tail -n 3
     mv final.*.h5 ../
     echo "DONE TRAIN " `date`
