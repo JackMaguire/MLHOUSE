@@ -206,10 +206,10 @@ def generate_data_from_files( filenames_csv, six_bin ):
 # START #
 #########
 
-if os.path.isfile( "../current.advanced2.5C.5L.5D.value.h5" ):
-    model1 = load_model( "../current.advanced2.5C.5L.5D.value.h5" )
+if os.path.isfile( "../current.base.h5" ):
+    model1 = load_model( "../current.base.h5" )
 else:
-    print( "Model ../current.advanced2.5C.5L.5D.value.h5 is not a file" )
+    print( "Model ../current.base.h5 is not a file" )
     exit( 1 )
 
 # 4) Fit Model
@@ -250,5 +250,5 @@ print( str( float( time_spent_loading ) / float(time_spent_loading + time_spent_
 print( time_spent_loading )
 print( time_spent_training )
 
-model1.save( "final.advanced2.5C.5L.5D.value.h5" )
+model1.save( "final.base.h5" )
 

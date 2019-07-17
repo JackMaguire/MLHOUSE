@@ -52,7 +52,7 @@ in1_D = Dense( name="in1_D", units=50, activation='relu' )( in1_C )
 
 
 #input2 = Input(shape=(36, 19, 27,), name="in2", dtype="float32" )
-input2 = Input(shape=(18468,), name="in2", dtype="float32" )
+input2 = Input(shape=(num_input_dimensions2,), name="in2", dtype="float32" )
 
 # Phase 1: in2 -> ABCDE
 pre = Reshape( target_shape=(36, 19, 27,) )( input2 )#ALWAYS DO WIDTH, HEIGHT, CHANNELS
