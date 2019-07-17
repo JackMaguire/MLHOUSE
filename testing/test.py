@@ -1,8 +1,8 @@
 import jack_mouse_test
 
 import os
-#os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
-#os.environ["CUDA_VISIBLE_DEVICES"] = ""
+os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
+os.environ["CUDA_VISIBLE_DEVICES"] = ""
 
 from random import shuffle
 
@@ -297,7 +297,7 @@ for line in file_lines:
             denorm_pred**(1.0/0.75)
 
         #print( norm_val, denorm_val, norm_pred, denorm_pred )
-        print( denorm_val, denorm_pred )
+        #print( denorm_val, denorm_pred )
 
         mse_pre_denorm += (norm_val-norm_pred)**2
         denorm_mse = (denorm_val-denorm_pred)**2
