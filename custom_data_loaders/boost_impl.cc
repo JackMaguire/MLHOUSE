@@ -24,6 +24,7 @@ namespace mouse_io {
 
 namespace {
 
+/*
 float
 normalize_output_value(
   float value
@@ -43,6 +44,24 @@ normalize_output_value(
 
   return value;
 }
+*/
+
+float
+normalize_output_value(
+  float value
+){
+  value += 10.0;
+
+  //Clip
+  if( value < 1.0 ){
+    value = 1.0;
+  }
+
+  value = log( log ( value ) ) - 1;
+
+  return value;
+}
+
 
 ndarray
 generate_output_data(
