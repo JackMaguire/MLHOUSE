@@ -28,12 +28,19 @@ float
 normalize_output_value(
   float value
 ){
-  if( value > 1 ){
-    //value = sqrt( value );
-    value = pow( value, 0.75 );
-  }
+  //Center
   value += 2.0;
-  value /= 3.0;
+
+  //Clip
+  if( value > 10.0 ){
+    value = 10.0;
+  }
+  else if( value < -10.0 ){
+    value = -10.0;
+  }
+
+  value /= 10.0;
+
   return value;
 }
 
