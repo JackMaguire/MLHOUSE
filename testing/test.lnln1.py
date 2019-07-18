@@ -223,7 +223,7 @@ def generate_data_from_files( filenames_csv, six_bin ):
         return source_input_no_resid, ray_input_no_resid, output_no_resid
 
 def denormalize_val( val ):
-    return exp( exp( val + 1 ) ) - 10;
+    return math.exp( math.exp( val + 1 ) ) - 10;
 
 #########
 # START #
