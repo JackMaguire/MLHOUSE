@@ -59,6 +59,8 @@ normalize_output_value(
 
   value = log( log ( value ) ) - 1;
 
+  if( value < -1.4 ) value = -1.4;
+
   return value;
 }
 

@@ -30,7 +30,7 @@ if [[ $command -eq 1 ]]; then
 else
     #run on current dir
     cd curr
-    if false ; then
+    if true ; then
 	head -n10 local_list.csv > local_list.10.csv
 	for x in ../sub_trains/*.py; do
 	    echo $x
