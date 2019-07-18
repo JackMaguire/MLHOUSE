@@ -222,6 +222,9 @@ def generate_data_from_files( filenames_csv, six_bin ):
             val /= 3.0
         return source_input_no_resid, ray_input_no_resid, output_no_resid
 
+def denormalize_val( val ):
+    #print( "denromalizing ", val, " to ", (math.exp( math.exp( val + 1 ) ) - 10) )
+    return math.exp( math.exp( val + 1 ) ) - 10;
 
 #########
 # START #
@@ -264,14 +267,10 @@ for line in file_lines:
         norm_val /= 3.0
         '''
         norm_val=output[ i ][ 0 ]
-        denorm_val = (norm_val*3.0)-2.0
-        if denorm_val > 1.0:
-            denorm_val**(1.0/0.75)
+        denorm_val = denormalize_val( norm_val )
 
         norm_pred=predictions[ i ][ 0 ]
-        denorm_pred = (norm_pred*3.0)-2.0
-        if denorm_pred > 1.0:
-            denorm_pred**(1.0/0.75)
+        denorm_pred = denormalize_val( norm_pred )
 
         sum += denorm_pred
 
