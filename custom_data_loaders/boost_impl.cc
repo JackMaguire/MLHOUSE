@@ -53,8 +53,8 @@ normalize_output_value(
   value += 10.0;
 
   //Clip
-  if( value < 1.0 ){
-    value = 1.0;
+  if( value < 1.00001 ){
+    value = 1.00001;
   }
 
   value = log( log ( value ) ) - 1;
