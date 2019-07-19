@@ -299,7 +299,7 @@ for line in file_lines:
         denorm_mse = (denorm_val-denorm_pred)**2
         mse_post_denorm += denorm_mse
 
-        print( denorm_val, denorm_pred )
+        #print( denorm_val, denorm_pred )
 
         allxs.append( denorm_val )
         allys.append( denorm_pred )
