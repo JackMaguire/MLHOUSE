@@ -1,8 +1,8 @@
 import jack_mouse_test
 
 import os
-os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
-os.environ["CUDA_VISIBLE_DEVICES"] = ""
+#os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
+#os.environ["CUDA_VISIBLE_DEVICES"] = ""
 
 from random import shuffle
 
@@ -236,36 +236,15 @@ else:
     print( "Model " + args.model + " is not a file" )
     exit( 1 )
 
-mse_pre_denorm = 0.
-mse_post_denorm = 0.
-mse_post_denorm_lt_0 = 0.
-mse_post_denorm_lt_n2 = 0.
-mse_post_denorm_lt_n4 = 0.
-mse_post_denorm_lt_n6 = 0.
-
-allxs = []
-allys = []
-
-xs_lt_0 = []
-ys_lt_0 = []
-
-xs_lt_n2 = []
-ys_lt_n2 = []
-
-xs_lt_n4 = []
-ys_lt_n4 = []
-
-xs_lt_n6 = []
-ys_lt_n6 = []
-
-
 # 4) Fit Model
 
 with open( args.data, "r" ) as f:
     file_lines = f.readlines()
 
 for line in file_lines:
-    #print( "reading " + str( line ) )
+    sum_val = 0.
+    sum_pred = 0.
+
     split = line.split( "\n" )[ 0 ].split( "," );
     my_assert_equals_thrower( "split.length", len( split ), 2 );
 
@@ -292,64 +271,11 @@ for line in file_lines:
         denorm_val = denormalize_val( norm_val )
 
         norm_pred=predictions[ i ][ 0 ]
-        #print( "prediction: ", predictions[ i ][ 0 ] )
         denorm_pred = denormalize_val( norm_pred )
 
-        mse_pre_denorm += (norm_val-norm_pred)**2
-        denorm_mse = (denorm_val-denorm_pred)**2
-        mse_post_denorm += denorm_mse
+        sum_val += denorm_val
+        sum_pred += denorm_pred
 
+        #print( norm_val, denorm_val, norm_pred, denorm_pred )
         #print( denorm_val, denorm_pred )
-
-        allxs.append( denorm_val )
-        allys.append( denorm_pred )
-        
-        if denorm_val < 0.:
-            xs_lt_0.append( denorm_val )
-            ys_lt_0.append( denorm_pred )
-            mse_post_denorm_lt_0 += denorm_mse
-            if denorm_val < -2.:
-                xs_lt_n2.append( denorm_val )
-                ys_lt_n2.append( denorm_pred )
-                mse_post_denorm_lt_n2 += denorm_mse
-                if denorm_val < -4.:
-                    xs_lt_n4.append( denorm_val )
-                    ys_lt_n4.append( denorm_pred )
-                    mse_post_denorm_lt_n4 += denorm_mse
-                    if denorm_val < -6.:
-                        xs_lt_n6.append( denorm_val )
-                        ys_lt_n6.append( denorm_pred )
-                        mse_post_denorm_lt_n6 += denorm_mse
-                
-mse_pre_denorm /= len(allxs)
-mse_post_denorm /= len(allxs)
-mse_post_denorm_lt_0 /= len(xs_lt_0)
-mse_post_denorm_lt_n2 /= len(xs_lt_n2)
-mse_post_denorm_lt_n4 /= len(xs_lt_n4)
-mse_post_denorm_lt_n6 /= len(xs_lt_n6)
-
-print( mse_pre_denorm, len(allxs) )
-print( mse_post_denorm, len(allxs) )
-print( mse_post_denorm_lt_0, len(xs_lt_0) )
-print( mse_post_denorm_lt_n2, len(xs_lt_n2) )
-print( mse_post_denorm_lt_n4, len(xs_lt_n4)  )
-print( mse_post_denorm_lt_n6, len(xs_lt_n6) )
-print( " " )
-print( scipy.stats.pearsonr( allxs, allys )[ 0 ] )
-print( scipy.stats.pearsonr( xs_lt_0, ys_lt_0 )[ 0 ] )
-print( scipy.stats.pearsonr( xs_lt_n2, ys_lt_n2 )[ 0 ] )
-print( scipy.stats.pearsonr( xs_lt_n4, ys_lt_n4 )[ 0 ] )
-print( scipy.stats.pearsonr( xs_lt_n6, ys_lt_n6 )[ 0 ] )
-print( " " )
-print( scipy.stats.spearmanr( allxs, allys ).correlation )
-print( scipy.stats.spearmanr( xs_lt_0, ys_lt_0 ).correlation )
-print( scipy.stats.spearmanr( xs_lt_n2, ys_lt_n2 ).correlation )
-print( scipy.stats.spearmanr( xs_lt_n4, ys_lt_n4 ).correlation )
-print( scipy.stats.spearmanr( xs_lt_n6, ys_lt_n6 ).correlation )
-print( " " )
-print( scipy.stats.kendalltau( allxs, allys ).correlation )
-print( scipy.stats.kendalltau( xs_lt_0, ys_lt_0 ).correlation )
-print( scipy.stats.kendalltau( xs_lt_n2, ys_lt_n2 ).correlation )
-print( scipy.stats.kendalltau( xs_lt_n4, ys_lt_n4 ).correlation )
-print( scipy.stats.kendalltau( xs_lt_n6, ys_lt_n6 ).correlation )
-
+    print(sum_val, sum_pred )
