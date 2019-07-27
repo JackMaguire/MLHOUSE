@@ -278,4 +278,4 @@ for line in file_lines:
 
         #print( norm_val, denorm_val, norm_pred, denorm_pred )
         #print( denorm_val, denorm_pred )
-    print(sum_val, sum_pred )
+    print( str(sum_val) + "," + str(sum_pred) )
