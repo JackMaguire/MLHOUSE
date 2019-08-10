@@ -60,16 +60,16 @@ input2 = Input(shape=(num_input_dimensions2,), name="in2", dtype="float32" )
 
 # Phase 1: in2 -> ABCDE
 pre = Reshape( target_shape=(36, 19, 27,) )( input2 )#ALWAYS DO WIDTH, HEIGHT, CHANNELS
-A = Conv2D( name="layerA", filters=30, kernel_size=(1,1), padding='valid', input_shape=pre.shape, data_format='channels_last', activation='relu', use_bias=True )( pre )
-B1 = Conv2D( name="layerB1", filters=20, kernel_size=(1,1), padding='valid', input_shape=A.shape,  data_format='channels_last', activation='relu', use_bias=True )( A )
-B2 = Conv2D( name="layerB2", filters=20, kernel_size=(1,1), padding='valid', input_shape=B1.shape, data_format='channels_last', activation='relu', use_bias=True )( B1 )
-B3 = Conv2D( name="layerB3", filters=15, kernel_size=(1,1), padding='valid', input_shape=B2.shape, data_format='channels_last', activation='relu', use_bias=True )( B2 )
+A = Conv2D( name="layerA", filters=30, kernel_size=(1,1), padding='valid',   data_format='channels_last', activation='relu', use_bias=True )( pre )
+B1 = Conv2D( name="layerB1", filters=20, kernel_size=(1,1), padding='valid', data_format='channels_last', activation='relu', use_bias=True )( A )
+B2 = Conv2D( name="layerB2", filters=20, kernel_size=(1,1), padding='valid', data_format='channels_last', activation='relu', use_bias=True )( B1 )
+B3 = Conv2D( name="layerB3", filters=15, kernel_size=(1,1), padding='valid', data_format='channels_last', activation='relu', use_bias=True )( B2 )
 merge = tensorflow.keras.layers.concatenate( [B3,in1up], name="merge", axis=-1 )
 
 # Phase 2: FGHIJ
 C = LocallyConnected2D( name="layerC", filters=12, kernel_size=(1,1), strides=(1,1), padding='valid', data_format='channels_last', activation='relu', use_bias=True )( merge )
 D = LocallyConnected2D( name="layerD", filters=10, kernel_size=(1,1), strides=(1,1), padding='valid', data_format='channels_last', activation='relu', use_bias=True )( C )
-E = LocallyConnected2D( name="layerE", filters=5, kernel_size=(1,1), strides=(1,1), padding='valid', data_format='channels_last', activation='relu', use_bias=True )( D )
+E = LocallyConnected2D( name="layerE", filters=10, kernel_size=(1,1), strides=(1,1), padding='valid', data_format='channels_last', activation='relu', use_bias=True )( D )
 
 Epool = MaxPooling2D(pool_size=(2, 1), strides=(2,1), padding='valid', data_format='channels_last')( E )
 print( Epool.shape )
@@ -77,7 +77,7 @@ F = LocallyConnected2D( name="layerF", filters=15, kernel_size=(6,4), strides=(4
 print( F.shape )
 flat = Flatten( name="flat", data_format='channels_last' )( F )
  
-dense1 = Dense( name="dense1", units=50, activation='relu' )( flat )
+dense1 = Dense( name="dense1", units=100, activation='relu' )( flat )
 dense2 = Dense( name="dense2", units=50, activation='relu' )( dense1 )
 dense3 = Dense( name="dense3", units=50, activation='relu' )( dense2 )
 dense4 = Dense( name="dense4", units=50, activation='relu' )( dense3 )
