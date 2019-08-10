@@ -3,9 +3,10 @@
 setup_next_dir(){
     next_dir_num=$1
     if [ ! -f /home/jackmag/top8000_mousetrap/contador_overflow/$next_dir_num.5d6260eb.tar.gz ]; then
-	scp jackmag@rosettadesign.med.unc.edu:~/mlhouse_training_data/training_data/$next_dir_num.5d6260eb.tar.gz /home/jackmag/top8000_mousetrap/contador_overflow/$next_dir_num.5d6260eb.tar.gz
+	scp jackmag@rosettadesign.med.unc.edu:~/mlhouse_training_data/training_data/$next_dir_num.5d6260eb.tar.gz .
+    else
+	ln -s /home/jackmag/top8000_mousetrap/contador_overflow/$next_dir_num.5d6260eb.tar.gz
     fi
-    ln -s /home/jackmag/top8000_mousetrap/contador_overflow/$next_dir_num.5d6260eb.tar.gz
 
 #    if [[ "$next_dir_num" -lt "0" ]]; then
 #	#local
