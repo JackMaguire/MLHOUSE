@@ -1,7 +1,7 @@
 #include <iostream>
 #include <math.h>
 
-constexpr double FLOOR = 0.0001;
+constexpr double FLOOR = 0.0005;
 constexpr double CEILING = 0.01;
 constexpr double CEILING2 = 2.0 * CEILING;
 
