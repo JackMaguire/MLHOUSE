@@ -292,7 +292,7 @@ for line in file_lines:
             x = pred.shape[ 1 ]
             y = pred.shape[ 2 ]
             n = pred.shape[ 3 ]
-            print( pred.shape, x, y, n )
+            print( i, pred.shape, x, y, n )
             for j in range( 0, n ):
                 plt.close('all')
                 plt.matshow( pred[0, :, :, j], cmap='viridis')
@@ -305,10 +305,11 @@ for line in file_lines:
             x = pred.shape[ 1 ]
             y = 1
             n = 1
-            print( pred.shape, x, y, n )
-            plt.matshow( pred[0, :, :, 0], cmap='viridis')
+            print( i, pred.shape, x, y, n )
+            plt.matshow( pred[0, :], cmap='viridis')
             plt.savefig( str(i) + '.pdf' )
             pass
         else:
             print( "length1 == ", length1, ", not printing" )
+            exit( 1 )
             #print( pred.shape, length1 )
