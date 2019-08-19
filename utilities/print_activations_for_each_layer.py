@@ -294,14 +294,20 @@ for line in file_lines:
             n = pred.shape[ 3 ]
             print( pred.shape, x, y, n )
             for j in range( 0, n ):
+                plt.close('all')
                 plt.matshow( pred[0, :, :, j], cmap='viridis')
                 plt.savefig( str(i) + '_' + str(j) + '.pdf' )
+            plt.close('all')
+            plt.matshow( pred[0, :, :, :], cmap='viridis')
+            plt.savefig( str(i) + '.pdf' )
             pass
         elif length1 == 2:
             x = pred.shape[ 1 ]
             y = 1
             n = 1
             print( pred.shape, x, y, n )
+            plt.matshow( pred[0, :, :, 0], cmap='viridis')
+            plt.savefig( str(i) + '.pdf' )
             pass
         else:
             print( "length1 == ", length1, ", not printing" )
