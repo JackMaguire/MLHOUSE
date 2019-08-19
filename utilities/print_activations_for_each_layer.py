@@ -236,15 +236,15 @@ else:
     print( "Model " + args.model + " is not a file" )
     exit( 1 )
 
+
+
 # 4) Fit Model
 
 with open( args.data, "r" ) as f:
     file_lines = f.readlines()
 
 for line in file_lines:
-    sum_val = 0.
-    sum_pred = 0.
-
+    #print( "reading " + str( line ) )
     split = line.split( "\n" )[ 0 ].split( "," );
     my_assert_equals_thrower( "split.length", len( split ), 2 );
 
@@ -256,26 +256,11 @@ for line in file_lines:
         #source_input, ray_input, output = generate_data_from_files( line, False )
     except AssertError:
         continue
+
+    if len( source_input ) > 1:
+        print( "Let's only submit one line at a time for now. Sorry buddy." )
+
+    #https://towardsdatascience.com/visualizing-intermediate-activation-in-convolutional-neural-networks-with-keras-260b36d60d0
+
     predictions = model.predict( x=[source_input,ray_input] )
-    my_assert_equals_thrower( "len( predictions )", len( predictions ), len( output ) );
-    for i in range( 0, len( predictions ) ):
-        '''
-        denorm_val=output[ i ][ 0 ]
-        norm_val = denorm_val
-        if norm_val > 1:
-            norm_val = norm_val**0.75
-        norm_val += 2.0
-        norm_val /= 3.0
-        '''
-        norm_val=output[ i ][ 0 ]
-        denorm_val = denormalize_val( norm_val )
-
-        norm_pred=predictions[ i ][ 0 ]
-        denorm_pred = denormalize_val( norm_pred )
-
-        sum_val += denorm_val
-        sum_pred += denorm_pred
-
-        #print( norm_val, denorm_val, norm_pred, denorm_pred )
-        #print( denorm_val, denorm_pred )
-    print( str(sum_val) + "," + str(sum_pred) )
+    print( predictions.shape )
