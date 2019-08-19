@@ -6,6 +6,8 @@ os.environ["CUDA_VISIBLE_DEVICES"] = ""
 
 from random import shuffle
 
+from matplotlib import pyplot as plt
+
 #from tensorflow.keras import *
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense
@@ -18,6 +20,8 @@ import tensorflow.keras.backend as K
 import tensorflow.keras.callbacks
 import tensorflow.keras
 import numpy
+
+from tensorflow.keras import models
 
 import sys
 #sys.path.append("/nas/longleaf/home/jackmag")#for h5py
@@ -243,6 +247,9 @@ else:
 with open( args.data, "r" ) as f:
     file_lines = f.readlines()
 
+layer_outputs = [layer.output for layer in model.layers]
+activation_model = models.Model( inputs=model.input, outputs=layer_outputs )
+
 for line in file_lines:
     #print( "reading " + str( line ) )
     split = line.split( "\n" )[ 0 ].split( "," );
@@ -257,10 +264,45 @@ for line in file_lines:
     except AssertError:
         continue
 
-    if len( source_input ) > 1:
-        print( "Let's only submit one line at a time for now. Sorry buddy." )
+
+    print( source_input.shape )
+    print( ray_input.shape )
+
+    #source_input = source_input[0:1]
+    #ray_input = ray_input[0:1]
+    source_input = source_input[24:25]
+    ray_input = ray_input[24:25]
+
+    print( source_input.shape )
+    print( ray_input.shape )
+    #exit( 0 )
+
+    #if len( source_input ) > 1:
+    #    print( "Let's only submit one line at a time for now. Sorry buddy." )
 
     #https://towardsdatascience.com/visualizing-intermediate-activation-in-convolutional-neural-networks-with-keras-260b36d60d0
 
-    predictions = model.predict( x=[source_input,ray_input] )
-    print( predictions.shape )
+    #predictions = model.predict( x=[source_input,ray_input] )
+    predictions = activation_model.predict( x=[source_input,ray_input] )
+    for i in range( 0, len( predictions ) ):
+        plt.close('all')
+        pred = predictions[ i ]
+        length1 = len( pred.shape )
+        if length1 == 4:
+            x = pred.shape[ 1 ]
+            y = pred.shape[ 2 ]
+            n = pred.shape[ 3 ]
+            print( pred.shape, x, y, n )
+            for j in range( 0, n ):
+                plt.matshow( pred[0, :, :, j], cmap='viridis')
+                plt.savefig( str(i) + '_' + str(j) + '.pdf' )
+            pass
+        elif length1 == 2:
+            x = pred.shape[ 1 ]
+            y = 1
+            n = 1
+            print( pred.shape, x, y, n )
+            pass
+        else:
+            print( "length1 == ", length1, ", not printing" )
+            #print( pred.shape, length1 )
