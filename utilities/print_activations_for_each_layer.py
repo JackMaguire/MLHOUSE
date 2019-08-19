@@ -7,6 +7,7 @@ os.environ["CUDA_VISIBLE_DEVICES"] = ""
 from random import shuffle
 
 from matplotlib import pyplot as plt
+from matplotlib.pyplot import *
 
 #from tensorflow.keras import *
 from tensorflow.keras.models import Sequential
@@ -240,7 +241,20 @@ else:
     print( "Model " + args.model + " is not a file" )
     exit( 1 )
 
-
+def display4( pred, filename ):
+    plt.close('all')
+    plt.axis('off')
+    images_per_row = 5
+    n_features = pred.shape[-1]
+    cols=int(5)
+    rows = int( int( n_features + cols - 1 ) / int( cols ) )
+    figure()
+    print( n_features, cols, rows )
+    for i in range( 0, n ):
+        ax = subplot( rows, cols, i + 1)
+        ax.axis('off')
+        matshow( pred[0, :, :, i], cmap='viridis', fignum=False)
+    plt.savefig( filename )
 
 # 4) Fit Model
 
@@ -249,6 +263,10 @@ with open( args.data, "r" ) as f:
 
 layer_outputs = [layer.output for layer in model.layers]
 activation_model = models.Model( inputs=model.input, outputs=layer_outputs )
+
+layer_names = []
+for layer in model.layers[:12]:
+    layer_names.append( layer.name )
 
 for line in file_lines:
     #print( "reading " + str( line ) )
@@ -284,7 +302,11 @@ for line in file_lines:
 
     #predictions = model.predict( x=[source_input,ray_input] )
     predictions = activation_model.predict( x=[source_input,ray_input] )
+    print( len( layer_names ), len( predictions ) )
+
     for i in range( 0, len( predictions ) ):
+        #name = layer_names[ i ]
+        name = "?"
         plt.close('all')
         pred = predictions[ i ]
         length1 = len( pred.shape )
@@ -292,22 +314,21 @@ for line in file_lines:
             x = pred.shape[ 1 ]
             y = pred.shape[ 2 ]
             n = pred.shape[ 3 ]
-            print( i, pred.shape, x, y, n )
+            print( name, i, pred.shape, x, y, n )
             for j in range( 0, n ):
                 plt.close('all')
                 plt.matshow( pred[0, :, :, j], cmap='viridis')
                 plt.savefig( str(i) + '_' + str(j) + '.pdf' )
             plt.close('all')
-            plt.matshow( pred[0, :, :, :], cmap='viridis')
-            plt.savefig( str(i) + '.pdf' )
+            display4( pred, str(i) + '.pdf' )
             pass
         elif length1 == 2:
             x = pred.shape[ 1 ]
             y = 1
             n = 1
-            print( i, pred.shape, x, y, n )
-            plt.matshow( pred[0, :], cmap='viridis')
-            plt.savefig( str(i) + '.pdf' )
+            print( name, i, pred.shape, x, y, n )
+            #plt.matshow( pred, cmap='viridis')
+            #plt.savefig( str(i) + '.pdf' )
             pass
         else:
             print( "length1 == ", length1, ", not printing" )
