@@ -254,7 +254,11 @@ def display4( pred, filename ):
         ax = subplot( rows, cols, i + 1)
         ax.axis('off')
         matshow( pred[0, :, :, i], cmap='viridis', fignum=False)
-    plt.savefig( filename )
+    #Good for 2,4,6,8
+    #plt.subplots_adjust(wspace=-0.8, hspace=0.1)
+    #Good for 10
+    plt.subplots_adjust(wspace=-0.2, hspace=0.1)
+    plt.savefig( filename, bbox_inches='tight' )
 
 # 4) Fit Model
 
@@ -315,10 +319,12 @@ for line in file_lines:
             y = pred.shape[ 2 ]
             n = pred.shape[ 3 ]
             print( name, i, pred.shape, x, y, n )
+            '''
             for j in range( 0, n ):
                 plt.close('all')
                 plt.matshow( pred[0, :, :, j], cmap='viridis')
                 plt.savefig( str(i) + '_' + str(j) + '.pdf' )
+            '''
             plt.close('all')
             display4( pred, str(i) + '.pdf' )
             pass
