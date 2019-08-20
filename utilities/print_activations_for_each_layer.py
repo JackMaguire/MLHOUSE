@@ -304,6 +304,7 @@ for line in file_lines:
     #source_input = source_input[24:25]
     #ray_input = ray_input[24:25]
 
+    #51 is good
     guy = 51
     guy2 = guy+1
 
