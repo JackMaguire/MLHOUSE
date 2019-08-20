@@ -91,6 +91,12 @@ parser.add_argument( "--data", help="CSV where each line has two elements. First
 
 args = parser.parse_args()
 
+def get_vmin():
+    return None
+
+def get_vmax():
+    return None
+
 #########
 # FUNCS #
 #########
@@ -253,7 +259,7 @@ def display4( pred, filename ):
     for i in range( 0, n ):
         ax = subplot( rows, cols, i + 1)
         ax.axis('off')
-        matshow( pred[0, :, :, i], cmap='viridis', fignum=False)
+        matshow( pred[0, :, :, i], cmap='viridis', fignum=False, vmin=get_vmin(), vmax=get_vmax())
     #Good for 2,4,6,8
     #plt.subplots_adjust(wspace=-0.8, hspace=0.1)
     #Good for 10
@@ -294,8 +300,70 @@ for line in file_lines:
 
     #source_input = source_input[0:1]
     #ray_input = ray_input[0:1]
-    source_input = source_input[24:25]
-    ray_input = ray_input[24:25]
+
+    #source_input = source_input[24:25]
+    #ray_input = ray_input[24:25]
+
+    guy = 51
+    guy2 = guy+1
+
+    source_input = source_input[guy:guy2]
+    ray_input = ray_input[guy:guy2]
+
+    '''
+    print( model.predict( x=[source_input,ray_input] ) )
+    source_input[0][0] = 0.0
+    print( model.predict( x=[source_input,ray_input] ) )
+    source_input[0][1] = 0.0
+    print( model.predict( x=[source_input,ray_input] ) )
+    source_input[0][2] = 0.0
+    print( model.predict( x=[source_input,ray_input] ) )
+    source_input[0][3] = 0.0
+    print( model.predict( x=[source_input,ray_input] ) )
+    source_input[0][4] = 0.0
+    print( model.predict( x=[source_input,ray_input] ) )
+    source_input[0][5] = 0.0
+    print( model.predict( x=[source_input,ray_input] ) )
+    source_input[0][6] = 0.0
+    print( model.predict( x=[source_input,ray_input] ) )
+    source_input[0][7] = 0.0
+    print( model.predict( x=[source_input,ray_input] ) )
+    source_input[0][8] = 0.0
+    print( model.predict( x=[source_input,ray_input] ) )
+    source_input[0][9] = 0.0
+    print( model.predict( x=[source_input,ray_input] ) )
+    source_input[0][10] = 0.0
+    print( model.predict( x=[source_input,ray_input] ) )
+    source_input[0][11] = 0.0
+    print( model.predict( x=[source_input,ray_input] ) )
+    source_input[0][12] = 0.0
+    print( model.predict( x=[source_input,ray_input] ) )
+    source_input[0][13] = 0.0
+    print( model.predict( x=[source_input,ray_input] ) )
+    source_input[0][14] = 0.0
+    print( model.predict( x=[source_input,ray_input] ) )
+    source_input[0][15] = 0.0
+    print( model.predict( x=[source_input,ray_input] ) )
+    source_input[0][16] = 0.0
+    print( model.predict( x=[source_input,ray_input] ) )
+    source_input[0][17] = 0.0
+    print( model.predict( x=[source_input,ray_input] ) )
+    source_input[0][18] = 0.0
+    print( model.predict( x=[source_input,ray_input] ) )
+    source_input[0][19] = 0.0
+    print( model.predict( x=[source_input,ray_input] ) )
+    source_input[0][20] = 0.0
+    print( model.predict( x=[source_input,ray_input] ) )
+    source_input[0][21] = 0.0
+    print( model.predict( x=[source_input,ray_input] ) )
+    source_input[0][22] = 0.0
+    print( model.predict( x=[source_input,ray_input] ) )
+    source_input[0][23] = 0.0
+    print( model.predict( x=[source_input,ray_input] ) )
+    source_input[0][24] = 0.0
+    print( model.predict( x=[source_input,ray_input] ) )
+    source_input[0][25] = 0.0
+    '''
 
     print( source_input.shape )
     print( ray_input.shape )
@@ -324,7 +392,7 @@ for line in file_lines:
             '''
             for j in range( 0, n ):
                 plt.close('all')
-                plt.matshow( pred[0, :, :, j], cmap='viridis')
+                plt.matshow( pred[0, :, :, j], cmap='viridis', vmin=0.0, vmax=0.1)
                 plt.savefig( str(i) + '_' + str(j) + '.pdf' )
             '''
             plt.close('all')
@@ -338,7 +406,7 @@ for line in file_lines:
             test = np.zeros(( 1, x ))
             for j in range( 0, x ):
                 test[0][j] = pred[0][j]
-            plt.matshow( test, cmap='viridis')
+            plt.matshow( test, cmap='viridis', vmin=get_vmin(), vmax=get_vmax())
             plt.savefig( str(i) + '.pdf' )
             pass
         else:
@@ -346,6 +414,10 @@ for line in file_lines:
             exit( 1 )
             #print( pred.shape, length1 )
 
-    print( predictions[ len( predictions ) - 2 ] )
-
-    print( model.predict( x=[source_input,ray_input] ) )
+    # print( predictions[ len( predictions ) - 2 ] )
+    '''
+    np.set_printoptions(threshold=sys.maxsize)
+    print( predictions[ 7 ] )
+    print( predictions[ 9 ] )
+    print( predictions[ 11 ] )
+    '''
