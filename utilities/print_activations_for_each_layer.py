@@ -262,7 +262,7 @@ def display4( pred, filename ):
         matshow( pred[0, :, :, i], cmap='viridis', fignum=False, vmin=get_vmin(), vmax=get_vmax())
     #Good for 2,4,6,8
     #plt.subplots_adjust(wspace=-0.8, hspace=0.1)
-    #Good for 10
+    #Good for 10, 13
     #plt.subplots_adjust(wspace=-0.2, hspace=0.1)
     #Good for 12
     #plt.subplots_adjust(wspace=-0.9, hspace=0.1)
@@ -408,6 +408,7 @@ for line in file_lines:
             for j in range( 0, x ):
                 test[0][j] = pred[0][j]
             plt.matshow( test, cmap='viridis', vmin=get_vmin(), vmax=get_vmax())
+            plt.axis('off')
             plt.savefig( str(i) + '.pdf' )
             pass
         else:
