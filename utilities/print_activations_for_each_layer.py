@@ -257,7 +257,9 @@ def display4( pred, filename ):
     #Good for 2,4,6,8
     #plt.subplots_adjust(wspace=-0.8, hspace=0.1)
     #Good for 10
-    plt.subplots_adjust(wspace=-0.2, hspace=0.1)
+    #plt.subplots_adjust(wspace=-0.2, hspace=0.1)
+    #Good for 12
+    #plt.subplots_adjust(wspace=-0.9, hspace=0.1)
     plt.savefig( filename, bbox_inches='tight' )
 
 # 4) Fit Model
@@ -333,10 +335,17 @@ for line in file_lines:
             y = 1
             n = 1
             print( name, i, pred.shape, x, y, n )
-            #plt.matshow( pred, cmap='viridis')
-            #plt.savefig( str(i) + '.pdf' )
+            test = np.zeros(( 1, x ))
+            for j in range( 0, x ):
+                test[0][j] = pred[0][j]
+            plt.matshow( test, cmap='viridis')
+            plt.savefig( str(i) + '.pdf' )
             pass
         else:
             print( "length1 == ", length1, ", not printing" )
             exit( 1 )
             #print( pred.shape, length1 )
+
+    print( predictions[ len( predictions ) - 2 ] )
+
+    print( model.predict( x=[source_input,ray_input] ) )
