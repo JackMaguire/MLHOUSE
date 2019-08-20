@@ -423,3 +423,29 @@ for line in file_lines:
     print( predictions[ 9 ] )
     print( predictions[ 11 ] )
     '''
+
+    '''
+    with tf.GradientTape() as tape:
+        #tape.watch( model.output )
+        tape.watch( model.input )
+        a = model( inputs=[source_input,ray_input] );
+        print( a )
+        #gradients = tape.gradient( model.output, model.input )
+        #gradients = tape.gradient( a, model.variables )
+        gradients = tape.gradient( a, model.layers[0] )
+        #gradients = tape.jacobian( a, model.input )
+        
+        for i in range( 0, len( gradients ) ):
+            grad = gradients[ i ]
+            num = 1
+            for n in grad.shape:
+                num *= n
+            print( num, i, grad.shape )
+    '''
+
+    #a = model( inputs=[source_input,ray_input] );
+    '''
+    a = model.predict( x=[source_input,ray_input] );
+    print( tf.gradients(model.output, model.input) )
+    '''
+    
