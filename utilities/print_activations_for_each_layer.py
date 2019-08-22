@@ -6,6 +6,9 @@ os.environ["CUDA_VISIBLE_DEVICES"] = ""
 
 from random import shuffle
 
+from matplotlib import pyplot as plt
+from matplotlib.pyplot import *
+
 #from tensorflow.keras import *
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense
@@ -18,6 +21,8 @@ import tensorflow.keras.backend as K
 import tensorflow.keras.callbacks
 import tensorflow.keras
 import numpy
+
+from tensorflow.keras import models
 
 import sys
 #sys.path.append("/nas/longleaf/home/jackmag")#for h5py
@@ -85,6 +90,12 @@ parser.add_argument( "--data", help="CSV where each line has two elements. First
 # ...
 
 args = parser.parse_args()
+
+def get_vmin():
+    return None
+
+def get_vmax():
+    return None
 
 #########
 # FUNCS #
@@ -236,15 +247,41 @@ else:
     print( "Model " + args.model + " is not a file" )
     exit( 1 )
 
+def display4( pred, filename ):
+    plt.close('all')
+    plt.axis('off')
+    images_per_row = 5
+    n_features = pred.shape[-1]
+    cols=int(5)
+    rows = int( int( n_features + cols - 1 ) / int( cols ) )
+    figure()
+    print( n_features, cols, rows )
+    for i in range( 0, n ):
+        ax = subplot( rows, cols, i + 1)
+        ax.axis('off')
+        matshow( pred[0, :, :, i], cmap='viridis', fignum=False, vmin=get_vmin(), vmax=get_vmax())
+    #Good for 2,4,6,8
+    #plt.subplots_adjust(wspace=-0.8, hspace=0.1)
+    #Good for 10, 13
+    #plt.subplots_adjust(wspace=-0.2, hspace=0.1)
+    #Good for 12
+    #plt.subplots_adjust(wspace=-0.9, hspace=0.1)
+    plt.savefig( filename, bbox_inches='tight' )
+
 # 4) Fit Model
 
 with open( args.data, "r" ) as f:
     file_lines = f.readlines()
 
-for line in file_lines:
-    sum_val = 0.
-    sum_pred = 0.
+layer_outputs = [layer.output for layer in model.layers]
+activation_model = models.Model( inputs=model.input, outputs=layer_outputs )
 
+layer_names = []
+for layer in model.layers[:12]:
+    layer_names.append( layer.name )
+
+for line in file_lines:
+    #print( "reading " + str( line ) )
     split = line.split( "\n" )[ 0 ].split( "," );
     my_assert_equals_thrower( "split.length", len( split ), 2 );
 
@@ -256,26 +293,159 @@ for line in file_lines:
         #source_input, ray_input, output = generate_data_from_files( line, False )
     except AssertError:
         continue
-    predictions = model.predict( x=[source_input,ray_input] )
-    my_assert_equals_thrower( "len( predictions )", len( predictions ), len( output ) );
+
+
+    print( source_input.shape )
+    print( ray_input.shape )
+
+    #source_input = source_input[0:1]
+    #ray_input = ray_input[0:1]
+
+    #source_input = source_input[24:25]
+    #ray_input = ray_input[24:25]
+
+    #51 is good
+    guy = 51
+    guy2 = guy+1
+
+    source_input = source_input[guy:guy2]
+    ray_input = ray_input[guy:guy2]
+
+    '''
+    print( model.predict( x=[source_input,ray_input] ) )
+    source_input[0][0] = 0.0
+    print( model.predict( x=[source_input,ray_input] ) )
+    source_input[0][1] = 0.0
+    print( model.predict( x=[source_input,ray_input] ) )
+    source_input[0][2] = 0.0
+    print( model.predict( x=[source_input,ray_input] ) )
+    source_input[0][3] = 0.0
+    print( model.predict( x=[source_input,ray_input] ) )
+    source_input[0][4] = 0.0
+    print( model.predict( x=[source_input,ray_input] ) )
+    source_input[0][5] = 0.0
+    print( model.predict( x=[source_input,ray_input] ) )
+    source_input[0][6] = 0.0
+    print( model.predict( x=[source_input,ray_input] ) )
+    source_input[0][7] = 0.0
+    print( model.predict( x=[source_input,ray_input] ) )
+    source_input[0][8] = 0.0
+    print( model.predict( x=[source_input,ray_input] ) )
+    source_input[0][9] = 0.0
+    print( model.predict( x=[source_input,ray_input] ) )
+    source_input[0][10] = 0.0
+    print( model.predict( x=[source_input,ray_input] ) )
+    source_input[0][11] = 0.0
+    print( model.predict( x=[source_input,ray_input] ) )
+    source_input[0][12] = 0.0
+    print( model.predict( x=[source_input,ray_input] ) )
+    source_input[0][13] = 0.0
+    print( model.predict( x=[source_input,ray_input] ) )
+    source_input[0][14] = 0.0
+    print( model.predict( x=[source_input,ray_input] ) )
+    source_input[0][15] = 0.0
+    print( model.predict( x=[source_input,ray_input] ) )
+    source_input[0][16] = 0.0
+    print( model.predict( x=[source_input,ray_input] ) )
+    source_input[0][17] = 0.0
+    print( model.predict( x=[source_input,ray_input] ) )
+    source_input[0][18] = 0.0
+    print( model.predict( x=[source_input,ray_input] ) )
+    source_input[0][19] = 0.0
+    print( model.predict( x=[source_input,ray_input] ) )
+    source_input[0][20] = 0.0
+    print( model.predict( x=[source_input,ray_input] ) )
+    source_input[0][21] = 0.0
+    print( model.predict( x=[source_input,ray_input] ) )
+    source_input[0][22] = 0.0
+    print( model.predict( x=[source_input,ray_input] ) )
+    source_input[0][23] = 0.0
+    print( model.predict( x=[source_input,ray_input] ) )
+    source_input[0][24] = 0.0
+    print( model.predict( x=[source_input,ray_input] ) )
+    source_input[0][25] = 0.0
+    '''
+
+    print( source_input.shape )
+    print( ray_input.shape )
+    #exit( 0 )
+
+    #if len( source_input ) > 1:
+    #    print( "Let's only submit one line at a time for now. Sorry buddy." )
+
+    #https://towardsdatascience.com/visualizing-intermediate-activation-in-convolutional-neural-networks-with-keras-260b36d60d0
+
+    #predictions = model.predict( x=[source_input,ray_input] )
+    predictions = activation_model.predict( x=[source_input,ray_input] )
+    print( len( layer_names ), len( predictions ) )
+
     for i in range( 0, len( predictions ) ):
-        '''
-        denorm_val=output[ i ][ 0 ]
-        norm_val = denorm_val
-        if norm_val > 1:
-            norm_val = norm_val**0.75
-        norm_val += 2.0
-        norm_val /= 3.0
-        '''
-        norm_val=output[ i ][ 0 ]
-        denorm_val = denormalize_val( norm_val )
+        #name = layer_names[ i ]
+        name = "?"
+        plt.close('all')
+        pred = predictions[ i ]
+        length1 = len( pred.shape )
+        if length1 == 4:
+            x = pred.shape[ 1 ]
+            y = pred.shape[ 2 ]
+            n = pred.shape[ 3 ]
+            print( name, i, pred.shape, x, y, n )
+            '''
+            for j in range( 0, n ):
+                plt.close('all')
+                plt.matshow( pred[0, :, :, j], cmap='viridis', vmin=0.0, vmax=0.1)
+                plt.savefig( str(i) + '_' + str(j) + '.pdf' )
+            '''
+            plt.close('all')
+            display4( pred, str(i) + '.pdf' )
+            pass
+        elif length1 == 2:
+            x = pred.shape[ 1 ]
+            y = 1
+            n = 1
+            print( name, i, pred.shape, x, y, n )
+            test = np.zeros(( 1, x ))
+            for j in range( 0, x ):
+                test[0][j] = pred[0][j]
+            plt.matshow( test, cmap='viridis', vmin=get_vmin(), vmax=get_vmax())
+            plt.axis('off')
+            plt.savefig( str(i) + '.pdf' )
+            pass
+        else:
+            print( "length1 == ", length1, ", not printing" )
+            exit( 1 )
+            #print( pred.shape, length1 )
 
-        norm_pred=predictions[ i ][ 0 ]
-        denorm_pred = denormalize_val( norm_pred )
+    # print( predictions[ len( predictions ) - 2 ] )
+    '''
+    np.set_printoptions(threshold=sys.maxsize)
+    print( predictions[ 7 ] )
+    print( predictions[ 9 ] )
+    print( predictions[ 11 ] )
+    '''
 
-        sum_val += denorm_val
-        sum_pred += denorm_pred
+    '''
+    with tf.GradientTape() as tape:
+        #tape.watch( model.output )
+        tape.watch( model.input )
+        a = model( inputs=[source_input,ray_input] );
+        print( a )
+        #gradients = tape.gradient( model.output, model.input )
+        #gradients = tape.gradient( a, model.variables )
+        gradients = tape.gradient( a, model.layers[0] )
+        #gradients = tape.jacobian( a, model.input )
+        
+        for i in range( 0, len( gradients ) ):
+            grad = gradients[ i ]
+            num = 1
+            for n in grad.shape:
+                num *= n
+            print( num, i, grad.shape )
+    '''
 
-        #print( norm_val, denorm_val, norm_pred, denorm_pred )
-        #print( denorm_val, denorm_pred )
-    print( str(sum_val) + "," + str(sum_pred) )
+    #a = model( inputs=[source_input,ray_input] );
+    '''
+    a = model.predict( x=[source_input,ray_input] );
+    print( tf.gradients(model.output, model.input) )
+    '''
+    
