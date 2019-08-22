@@ -29,27 +29,6 @@ float
 normalize_output_value(
   float value
 ){
-  //Center
-  value += 2.0;
-
-  //Clip
-  if( value > 10.0 ){
-    value = 10.0;
-  }
-  else if( value < -10.0 ){
-    value = -10.0;
-  }
-
-  value /= 10.0;
-
-  return value;
-}
-*/
-
-float
-normalize_output_value(
-  float value
-){
   value += 10.0;
 
   //Clip
@@ -62,6 +41,14 @@ normalize_output_value(
   if( value < -1.4 ) value = -1.4;
 
   return value;
+}
+*/
+
+float
+normalize_output_value(
+  float value
+){
+  return exp( value / -15.0 ) - 1;
 }
 
 
