@@ -43,7 +43,7 @@ a_val=0.25
 numpy.random.seed( 0 )
 
 parser = argparse.ArgumentParser()
-parser.add_argument( "--model", help="filename for output file", default="start.base.high_channel.smallestdeep.partiallyleaky", required=False )
+parser.add_argument( "--model", help="filename for output file", default="start.base2", required=False )
 args = parser.parse_args()
 
 num_input_dimensions1 = 26
@@ -74,11 +74,11 @@ merge = tensorflow.keras.layers.concatenate( [B3,in1up], name="merge", axis=-1 )
 # Phase 2: FGHIJ
 C = LocallyConnected2D( name="layerC", filters=12, kernel_size=(1,1), strides=(1,1), padding='valid', data_format='channels_last', activation='relu', use_bias=True )( merge )
 D = LocallyConnected2D( name="layerD", filters=10, kernel_size=(1,1), strides=(1,1), padding='valid', data_format='channels_last', activation='relu', use_bias=True )( C )
-E = LocallyConnected2D( name="layerE", filters=10, kernel_size=(1,1), strides=(1,1), padding='valid', data_format='channels_last', activation='relu', use_bias=True )( D )
+E = LocallyConnected2D( name="layerE", filters=10, kernel_size=(2,1), strides=(2,1), padding='valid', data_format='channels_last', activation='relu', use_bias=True )( D )
 
-Epool = MaxPooling2D(pool_size=(2, 1), strides=(2,1), padding='valid', data_format='channels_last')( E )
-print( Epool.shape )
-F = LocallyConnected2D( name="layerF", filters=15, kernel_size=(6,4), strides=(4,3), padding='valid', data_format='channels_last', activation='relu', use_bias=True )( Epool )
+#Epool = MaxPooling2D(pool_size=(2, 1), strides=(2,1), padding='valid', data_format='channels_last')( E )
+#print( Epool.shape )
+F = LocallyConnected2D( name="layerF", filters=15, kernel_size=(6,4), strides=(4,3), padding='valid', data_format='channels_last', activation='relu', use_bias=True )( E )
 print( F.shape )
 flat = Flatten( name="flat", data_format='channels_last' )( F )
  
