@@ -223,8 +223,17 @@ def generate_data_from_files( filenames_csv, six_bin ):
         return source_input_no_resid, ray_input_no_resid, output_no_resid
 
 def denormalize_val( val ):
-    #print( "denromalizing ", val, " to ", (math.exp( math.exp( val + 1 ) ) - 10) )
-    return math.exp( math.exp( val + 1 ) ) - 10;
+    #return math.exp( math.exp( val + 1 ) ) - 10;
+    if val <  -0.999:
+        val = -0.999
+    try:
+        i = math.log( val + 1.0 ) * -15.0
+    except:
+        print( "Trouble denormalizing:", val )
+        #print( e )
+        exit( 1 )
+    return i
+
 
 #########
 # START #

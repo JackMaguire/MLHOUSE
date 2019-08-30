@@ -137,83 +137,19 @@ def assert_vecs_line_up( input, output ):
         out_resid = int( out_elem.split( " " )[ 1 ] )
         my_assert_equals_thrower( "out_resid", out_resid, in_resid )
 
-def generate_data_from_files( filenames_csv, six_bin ):
-    #dataset = numpy.genfromtxt( filename, delimiter=",", skip_header=0 )
-    split = filenames_csv.split( "\n" )[ 0 ].split( "," );
-    my_assert_equals_thrower( "split.length", len( split ), 2 );
-
-    #t0 = time.time()
-
-    # Both of these elements lead with a dummy
-    if split[ 0 ].endswith( ".csv.gz" ):
-        f = gzip.GzipFile( split[ 0 ], "r" )
-        input = pd.read_csv( f, header=None ).values
-        f.close()
-    elif split[ 0 ].endswith( ".csv" ):
-        input = pd.read_csv( split[ 0 ], header=None ).values
-    elif split[ 0 ].endswith( ".npy.gz" ):
-        f = gzip.GzipFile( split[ 0 ], "r" )
-        input = numpy.load( f, allow_pickle=True )
-        f.close()
-    elif split[ 0 ].endswith( ".npy" ):
-        input = numpy.load( split[ 0 ], allow_pickle=True )
-    else:
-        print ( "We cannot open this file format: " + split[ 0 ] )
-        exit( 1 )
-
-    if split[ 1 ].endswith( ".csv.gz" ):
-        f = gzip.GzipFile( split[ 1 ], "r" )
-        output = pd.read_csv( f, header=None ).values
-        f.close()
-    elif split[ 1 ].endswith( ".csv" ):
-        output = pd.read_csv( split[ 1 ], header=None ).values
-    elif split[ 1 ].endswith( ".npy.gz" ):
-        f = gzip.GzipFile( split[ 1 ], "r" )
-        output = numpy.load( f, allow_pickle=True )
-        f.close()
-    elif split[ 1 ].endswith( ".npy" ):
-        output = numpy.load( split[ 1 ], allow_pickle=True )
-    else:
-        print ( "We cannot open this file format: " + split[ 1 ] )
-        exit( 1 )
-
-    assert_vecs_line_up( input, output )
-
-    source_input_no_resid = input[:,1:27]
-    ray_input_no_resid = input[:,27:]
-
-    #print( "output.shape:" )
-    #print( output.shape )
-    output_no_resid = output[:,1:2]
-    #print( "output_no_resid.shape:" )
-    #print( output_no_resid.shape )
-
-    my_assert_equals_thrower( "len( source_input_no_resid[ 0 ] )", len( source_input_no_resid[ 0 ] ), num_source_residue_inputs );
-    my_assert_equals_thrower( "len( ray_input_no_resid[ 0 ] )",    len( ray_input_no_resid[ 0 ] ), num_ray_inputs );
-
-    #https://www.kaggle.com/vishwasgpai/guide-for-creating-cnn-model-using-csv-file        
-
-    my_assert_equals_thrower( "len( output_no_resid[ 0 ] )", len( output_no_resid[ 0 ] ), num_output_dimensions );
-    for x in range( 0, len( output_no_resid ) ):
-        my_assert_equals_thrower( "len(output_no_resid[x])", len(output_no_resid[x]), 1 )
-        val = output_no_resid[x][0]
-        val = math.exp( -15.0 * val ) - 1.0
-        '''
-        #Stunt large values
-        if( val > 1 ):
-            val = val**0.75
-        #subtract mean of -2:
-        val += 2.0
-        #divide by span of 3:
-        val /= 3.0
-        '''
-        output_no_resid[x][0] = val
-    return source_input_no_resid, ray_input_no_resid, output_no_resid
 
 def denormalize_val( val ):
     #print( "denromalizing ", val, " to ", (math.exp( math.exp( val + 1 ) ) - 10) )
     #return math.exp( math.exp( val + 1 ) ) - 10;
-    return math.log( val + 1.0 ) * -15.0
+    if val <= -1.0:
+        val = -0.999
+    try:
+        i = math.log( val + 1.0 ) * -15.0
+    except:
+        print( val )
+        #print( e )
+        exit( 1 )
+    return i
 
 #########
 # START #
@@ -263,7 +199,6 @@ for line in file_lines:
         source_input = cpp_structs[ 0 ]
         ray_input = cpp_structs[ 1 ]
         output = cpp_structs[ 2 ]
-        #source_input, ray_input, output = generate_data_from_files( line, False )
     except AssertError:
         continue
     predictions = model.predict( x=[source_input,ray_input] )
@@ -342,3 +277,5 @@ print( scipy.stats.kendalltau( xs_lt_n2, ys_lt_n2 ).correlation )
 print( scipy.stats.kendalltau( xs_lt_n4, ys_lt_n4 ).correlation )
 print( scipy.stats.kendalltau( xs_lt_n6, ys_lt_n6 ).correlation )
 
+#for x in range( 0, len( allxs ) ):
+#    print( allxs[x], allys[x] )
