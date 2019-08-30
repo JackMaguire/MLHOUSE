@@ -137,103 +137,19 @@ def assert_vecs_line_up( input, output ):
         out_resid = int( out_elem.split( " " )[ 1 ] )
         my_assert_equals_thrower( "out_resid", out_resid, in_resid )
 
-def generate_data_from_files( filenames_csv, six_bin ):
-    #dataset = numpy.genfromtxt( filename, delimiter=",", skip_header=0 )
-    split = filenames_csv.split( "\n" )[ 0 ].split( "," );
-    my_assert_equals_thrower( "split.length", len( split ), 2 );
-
-    #t0 = time.time()
-
-    # Both of these elements lead with a dummy
-    if split[ 0 ].endswith( ".csv.gz" ):
-        f = gzip.GzipFile( split[ 0 ], "r" )
-        input = pd.read_csv( f, header=None ).values
-        f.close()
-    elif split[ 0 ].endswith( ".csv" ):
-        input = pd.read_csv( split[ 0 ], header=None ).values
-    elif split[ 0 ].endswith( ".npy.gz" ):
-        f = gzip.GzipFile( split[ 0 ], "r" )
-        input = numpy.load( f, allow_pickle=True )
-        f.close()
-    elif split[ 0 ].endswith( ".npy" ):
-        input = numpy.load( split[ 0 ], allow_pickle=True )
-    else:
-        print ( "We cannot open this file format: " + split[ 0 ] )
-        exit( 1 )
-
-    if split[ 1 ].endswith( ".csv.gz" ):
-        f = gzip.GzipFile( split[ 1 ], "r" )
-        output = pd.read_csv( f, header=None ).values
-        f.close()
-    elif split[ 1 ].endswith( ".csv" ):
-        output = pd.read_csv( split[ 1 ], header=None ).values
-    elif split[ 1 ].endswith( ".npy.gz" ):
-        f = gzip.GzipFile( split[ 1 ], "r" )
-        output = numpy.load( f, allow_pickle=True )
-        f.close()
-    elif split[ 1 ].endswith( ".npy" ):
-        output = numpy.load( split[ 1 ], allow_pickle=True )
-    else:
-        print ( "We cannot open this file format: " + split[ 1 ] )
-        exit( 1 )
-
-    assert_vecs_line_up( input, output )
-
-    source_input_no_resid = input[:,1:27]
-    ray_input_no_resid = input[:,27:]
-
-    #print( "output.shape:" )
-    #print( output.shape )
-    output_no_resid = output[:,1:2]
-    #print( "output_no_resid.shape:" )
-    #print( output_no_resid.shape )
-
-    my_assert_equals_thrower( "len( source_input_no_resid[ 0 ] )", len( source_input_no_resid[ 0 ] ), num_source_residue_inputs );
-    my_assert_equals_thrower( "len( ray_input_no_resid[ 0 ] )",    len( ray_input_no_resid[ 0 ] ), num_ray_inputs );
-
-    #https://www.kaggle.com/vishwasgpai/guide-for-creating-cnn-model-using-csv-file        
-
-    if six_bin:
-        six_bin_output_no_resid = output_no_resid.copy()
-        new_shape = ( output_no_resid.shape[ 0 ], num_output_dimensions )
-        six_bin_output_no_resid.resize( new_shape )
-        for x in range( 0, len( output_no_resid ) ):
-            my_assert_equals_thrower( "len(six_bin_output_no_resid[ x ])", len( six_bin_output_no_resid[ x ] ), num_output_dimensions )
-            six_bin_output_no_resid[ x ][ 0 ] = 1.0 if output_no_resid[ x ][ 0 ] <= -7.0 else 0.0
-            six_bin_output_no_resid[ x ][ 1 ] = 1.0 if output_no_resid[ x ][ 0 ] <= -5.0 else 0.0
-            six_bin_output_no_resid[ x ][ 2 ] = 1.0 if output_no_resid[ x ][ 0 ] <= -3.0 else 0.0
-            six_bin_output_no_resid[ x ][ 3 ] = 1.0 if output_no_resid[ x ][ 0 ] <= -1.0 else 0.0
-            six_bin_output_no_resid[ x ][ 4 ] = 1.0 if output_no_resid[ x ][ 0 ] <= 1.0  else 0.0
-            six_bin_output_no_resid[ x ][ 5 ] = 1.0 if output_no_resid[ x ][ 0 ] <= 3.0  else 0.0
-            six_bin_output_no_resid[ x ][ 6 ] = 1.0 if output_no_resid[ x ][ 0 ] <= 5.0  else 0.0
-            six_bin_output_no_resid[ x ][ 7 ] = 1.0 if output_no_resid[ x ][ 0 ] <= 7.0  else 0.0
-        return source_input_no_resid, ray_input_no_resid, six_bin_output_no_resid
-    else:
-        my_assert_equals_thrower( "len( output_no_resid[ 0 ] )", len( output_no_resid[ 0 ] ), num_output_dimensions );
-        for x in range( 0, len( output_no_resid ) ):
-            my_assert_equals_thrower( "len(output_no_resid[x])", len(output_no_resid[x]), 1 )
-            val = output_no_resid[x][0]
-            #Stunt large values
-            if( val > 1 ):
-                val = val**0.75
-            #subtract mean of -2:
-            val += 2.0
-            #divide by span of 3:
-            val /= 3.0
-        return source_input_no_resid, ray_input_no_resid, output_no_resid
 
 def denormalize_val( val ):
+    #print( "denromalizing ", val, " to ", (math.exp( math.exp( val + 1 ) ) - 10) )
     #return math.exp( math.exp( val + 1 ) ) - 10;
-    if val <  -0.999:
+    if val <= -1.0:
         val = -0.999
     try:
         i = math.log( val + 1.0 ) * -15.0
     except:
-        print( "Trouble denormalizing:", val )
+        print( val )
         #print( e )
         exit( 1 )
     return i
-
 
 #########
 # START #
@@ -245,15 +161,36 @@ else:
     print( "Model " + args.model + " is not a file" )
     exit( 1 )
 
+mse_pre_denorm = 0.
+mse_post_denorm = 0.
+mse_post_denorm_lt_0 = 0.
+mse_post_denorm_lt_n2 = 0.
+mse_post_denorm_lt_n4 = 0.
+mse_post_denorm_lt_n6 = 0.
+
+allxs = []
+allys = []
+
+xs_lt_0 = []
+ys_lt_0 = []
+
+xs_lt_n2 = []
+ys_lt_n2 = []
+
+xs_lt_n4 = []
+ys_lt_n4 = []
+
+xs_lt_n6 = []
+ys_lt_n6 = []
+
+
 # 4) Fit Model
 
 with open( args.data, "r" ) as f:
     file_lines = f.readlines()
 
 for line in file_lines:
-    sum_val = 0.
-    sum_pred = 0.
-
+    #print( "reading " + str( line ) )
     split = line.split( "\n" )[ 0 ].split( "," );
     my_assert_equals_thrower( "split.length", len( split ), 2 );
 
@@ -262,7 +199,6 @@ for line in file_lines:
         source_input = cpp_structs[ 0 ]
         ray_input = cpp_structs[ 1 ]
         output = cpp_structs[ 2 ]
-        #source_input, ray_input, output = generate_data_from_files( line, False )
     except AssertError:
         continue
     predictions = model.predict( x=[source_input,ray_input] )
@@ -280,11 +216,66 @@ for line in file_lines:
         denorm_val = denormalize_val( norm_val )
 
         norm_pred=predictions[ i ][ 0 ]
+        #print( "prediction: ", predictions[ i ][ 0 ] )
         denorm_pred = denormalize_val( norm_pred )
 
-        sum_val += denorm_val
-        sum_pred += denorm_pred
+        mse_pre_denorm += (norm_val-norm_pred)**2
+        denorm_mse = (denorm_val-denorm_pred)**2
+        mse_post_denorm += denorm_mse
 
-        #print( norm_val, denorm_val, norm_pred, denorm_pred )
         #print( denorm_val, denorm_pred )
-    print( str(sum_val) + "," + str(sum_pred) )
+
+        allxs.append( denorm_val )
+        allys.append( denorm_pred )
+        
+        if denorm_val < 0.:
+            xs_lt_0.append( denorm_val )
+            ys_lt_0.append( denorm_pred )
+            mse_post_denorm_lt_0 += denorm_mse
+            if denorm_val < -2.:
+                xs_lt_n2.append( denorm_val )
+                ys_lt_n2.append( denorm_pred )
+                mse_post_denorm_lt_n2 += denorm_mse
+                if denorm_val < -4.:
+                    xs_lt_n4.append( denorm_val )
+                    ys_lt_n4.append( denorm_pred )
+                    mse_post_denorm_lt_n4 += denorm_mse
+                    if denorm_val < -6.:
+                        xs_lt_n6.append( denorm_val )
+                        ys_lt_n6.append( denorm_pred )
+                        mse_post_denorm_lt_n6 += denorm_mse
+                
+mse_pre_denorm /= len(allxs)
+mse_post_denorm /= len(allxs)
+mse_post_denorm_lt_0 /= len(xs_lt_0)
+mse_post_denorm_lt_n2 /= len(xs_lt_n2)
+mse_post_denorm_lt_n4 /= len(xs_lt_n4)
+mse_post_denorm_lt_n6 /= len(xs_lt_n6)
+
+print( mse_pre_denorm, len(allxs) )
+print( mse_post_denorm, len(allxs) )
+print( mse_post_denorm_lt_0, len(xs_lt_0) )
+print( mse_post_denorm_lt_n2, len(xs_lt_n2) )
+print( mse_post_denorm_lt_n4, len(xs_lt_n4)  )
+print( mse_post_denorm_lt_n6, len(xs_lt_n6) )
+print( " " )
+print( scipy.stats.pearsonr( allxs, allys )[ 0 ] )
+print( scipy.stats.pearsonr( xs_lt_0, ys_lt_0 )[ 0 ] )
+print( scipy.stats.pearsonr( xs_lt_n2, ys_lt_n2 )[ 0 ] )
+print( scipy.stats.pearsonr( xs_lt_n4, ys_lt_n4 )[ 0 ] )
+print( scipy.stats.pearsonr( xs_lt_n6, ys_lt_n6 )[ 0 ] )
+print( " " )
+print( scipy.stats.spearmanr( allxs, allys ).correlation )
+print( scipy.stats.spearmanr( xs_lt_0, ys_lt_0 ).correlation )
+print( scipy.stats.spearmanr( xs_lt_n2, ys_lt_n2 ).correlation )
+print( scipy.stats.spearmanr( xs_lt_n4, ys_lt_n4 ).correlation )
+print( scipy.stats.spearmanr( xs_lt_n6, ys_lt_n6 ).correlation )
+print( " " )
+print( scipy.stats.kendalltau( allxs, allys ).correlation )
+print( scipy.stats.kendalltau( xs_lt_0, ys_lt_0 ).correlation )
+print( scipy.stats.kendalltau( xs_lt_n2, ys_lt_n2 ).correlation )
+print( scipy.stats.kendalltau( xs_lt_n4, ys_lt_n4 ).correlation )
+print( scipy.stats.kendalltau( xs_lt_n6, ys_lt_n6 ).correlation )
+
+#for x in range( 0, len( allxs ) ):
+#    print( allxs[x], allys[x] )
