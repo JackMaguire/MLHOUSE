@@ -131,7 +131,8 @@ else:
 
 #0.001 is default
 #model1.optimizer.lr = 0.00025
-model1.optimizer.lr = 0.005
+model1.optimizer.lr = 0.001
+#model1.optimizer.lr = 0.005
 print( "lr:", model1.optimizer.lr )
 
 # 4) Fit Model

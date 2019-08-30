@@ -24,33 +24,36 @@ float process(
 float outer_process(
   float const floor,
   float const ceiling,
+  float const span,
   float val
 ){
   // if( val >= 10.0 ) val += 10.0;
   // std::cout << val << std::endl;
 
-  while( val >= 10.0 ){
-    val -= 15.0;
+  while( val >= (span/2.0) ){
+    val -= span;
   }
 
-  val += 5.0;
+  val += (span/2.0);
 
   return process( floor, ceiling, val );
 }
 
+//Try 8, 12, 16, 20
 int main( int argc, char* argv[] ){
 
-  if ( argc != 4 ) {
-    std::cerr << "Usage: " << argv[0] << " FLOOR CEILING EPOCH.SUBEPOCH" << std::endl;
+  if ( argc != 5 ) {
+    std::cerr << "Usage: " << argv[0] << " FLOOR CEILING SPAN EPOCH.SUBEPOCH" << std::endl;
     return 1;
   }
 
   float const floor = std::atof( argv[ 1 ] );
   float const ceiling = std::atof( argv[ 2 ] );
-  float const val = std::atof( argv[ 3 ] );
+  float const span = std::atof( argv[ 3 ] );
+  float const val = std::atof( argv[ 4 ] );
 
-  //std::cout << outer_process( floor, ceiling, val ) << std::endl;
+  //std::cout << outer_process( floor, ceiling, span, val ) << std::endl;
   for( double x = 0.0; x <= 50.0; x += 0.1 ){
-    std::cout << x << "," << outer_process( floor, ceiling, x ) << std::endl;
+    std::cout << x << "," << outer_process( floor, ceiling, span, x ) << std::endl;
   }
 }
