@@ -6,17 +6,6 @@ os.environ["CUDA_VISIBLE_DEVICES"] = ""
 
 from random import shuffle
 
-#from tensorflow.keras import *
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense
-from tensorflow.keras import metrics
-
-import tensorflow.keras.losses
-
-from tensorflow.keras.models import load_model
-import tensorflow.keras.backend as K
-import tensorflow.keras.callbacks
-import tensorflow.keras
 import numpy
 
 import sys
@@ -34,28 +23,12 @@ import random
 import time
 import subprocess
 
-import scipy
-import scipy.stats
+#import scipy
+#import scipy.stats
 
-#from tensorflow.python.client import device_lib
-#print(device_lib.list_local_devices())
+import numba
 
-import tensorflow as tf
-#from tensorflow.keras.backend.tensorflow_backend import set_session
-
-'''
-#Only use part of the GPU, from https://github.com/keras-team/keras/issues/4161
-config = tf.ConfigProto()
-config.gpu_options.allow_growth = True  # dynamically grow the memory used on the GPU
-config.gpu_options.per_process_gpu_memory_fraction = 0.3
-#config.gpu_options.visible_device_list = "0"
-config.log_device_placement = True  # to log device placement (on which device the operation ran)
-                                    # (nothing gets printed in Jupyter, only if you run it standalone)
-sess = tf.Session(config=config)
-set_session(sess)  # set this TensorFlow session as the default session for Keras
-
-'''
-
+exit( 1 )
 ########
 # INIT #
 ########
@@ -75,7 +48,7 @@ numpy.random.seed( 0 )
 
 parser = argparse.ArgumentParser()
 
-parser.add_argument( "--model", help="Most recent model file", required=True )
+#parser.add_argument( "--model", help="Most recent model file", required=True )
 
 parser.add_argument( "--data", help="CSV where each line has two elements. First element is the absolute path to the input csv file, second element is the absolute path to the corresponding output csv file.", required=True )
 # Example: "--data foo.csv" where foo.csv looks like:
@@ -89,23 +62,6 @@ args = parser.parse_args()
 #########
 # FUNCS #
 #########
-
-def hello_world():
-    x1 = [ 1., 2., 4. ]
-    y1 = [ 2., 4., 6. ]
-
-    x2 = [ 1., 2., 4. ]
-    y2 = [ 0., 3., 3. ]
-
-    print( scipy.stats.pearsonr( x1, y1 )[ 0 ] )
-    print( scipy.stats.pearsonr( x2, y2 )[ 0 ] )
-
-    print( scipy.stats.spearmanr( x1, y1 ).correlation )
-    print( scipy.stats.spearmanr( x2, y2 ).correlation )
-
-    print( scipy.stats.kendalltau( x1, y1 ).correlation )
-    print( scipy.stats.kendalltau( x2, y2 ).correlation )
-
 
 def my_assert_equals( name, actual, theoretical ):
     if actual != theoretical:
@@ -151,12 +107,6 @@ def generate_data_from_files( filenames_csv, six_bin ):
         f.close()
     elif split[ 0 ].endswith( ".csv" ):
         input = pd.read_csv( split[ 0 ], header=None ).values
-    elif split[ 0 ].endswith( ".npy.gz" ):
-        f = gzip.GzipFile( split[ 0 ], "r" )
-        input = numpy.load( f, allow_pickle=True )
-        f.close()
-    elif split[ 0 ].endswith( ".npy" ):
-        input = numpy.load( split[ 0 ], allow_pickle=True )
     else:
         print ( "We cannot open this file format: " + split[ 0 ] )
         exit( 1 )
@@ -167,12 +117,6 @@ def generate_data_from_files( filenames_csv, six_bin ):
         f.close()
     elif split[ 1 ].endswith( ".csv" ):
         output = pd.read_csv( split[ 1 ], header=None ).values
-    elif split[ 1 ].endswith( ".npy.gz" ):
-        f = gzip.GzipFile( split[ 1 ], "r" )
-        output = numpy.load( f, allow_pickle=True )
-        f.close()
-    elif split[ 1 ].endswith( ".npy" ):
-        output = numpy.load( split[ 1 ], allow_pickle=True )
     else:
         print ( "We cannot open this file format: " + split[ 1 ] )
         exit( 1 )
@@ -193,71 +137,27 @@ def generate_data_from_files( filenames_csv, six_bin ):
 
     #https://www.kaggle.com/vishwasgpai/guide-for-creating-cnn-model-using-csv-file        
 
-    if six_bin:
-        six_bin_output_no_resid = output_no_resid.copy()
-        new_shape = ( output_no_resid.shape[ 0 ], num_output_dimensions )
-        six_bin_output_no_resid.resize( new_shape )
-        for x in range( 0, len( output_no_resid ) ):
-            my_assert_equals_thrower( "len(six_bin_output_no_resid[ x ])", len( six_bin_output_no_resid[ x ] ), num_output_dimensions )
-            six_bin_output_no_resid[ x ][ 0 ] = 1.0 if output_no_resid[ x ][ 0 ] <= -7.0 else 0.0
-            six_bin_output_no_resid[ x ][ 1 ] = 1.0 if output_no_resid[ x ][ 0 ] <= -5.0 else 0.0
-            six_bin_output_no_resid[ x ][ 2 ] = 1.0 if output_no_resid[ x ][ 0 ] <= -3.0 else 0.0
-            six_bin_output_no_resid[ x ][ 3 ] = 1.0 if output_no_resid[ x ][ 0 ] <= -1.0 else 0.0
-            six_bin_output_no_resid[ x ][ 4 ] = 1.0 if output_no_resid[ x ][ 0 ] <= 1.0  else 0.0
-            six_bin_output_no_resid[ x ][ 5 ] = 1.0 if output_no_resid[ x ][ 0 ] <= 3.0  else 0.0
-            six_bin_output_no_resid[ x ][ 6 ] = 1.0 if output_no_resid[ x ][ 0 ] <= 5.0  else 0.0
-            six_bin_output_no_resid[ x ][ 7 ] = 1.0 if output_no_resid[ x ][ 0 ] <= 7.0  else 0.0
-        return source_input_no_resid, ray_input_no_resid, six_bin_output_no_resid
-    else:
-        my_assert_equals_thrower( "len( output_no_resid[ 0 ] )", len( output_no_resid[ 0 ] ), num_output_dimensions );
-        for x in range( 0, len( output_no_resid ) ):
-            my_assert_equals_thrower( "len(output_no_resid[x])", len(output_no_resid[x]), 1 )
-            val = output_no_resid[x][0]
-            #Stunt large values
-            if( val > 1 ):
-                val = val**0.75
-            #subtract mean of -2:
-            val += 2.0
-            #divide by span of 3:
-            val /= 3.0
-        return source_input_no_resid, ray_input_no_resid, output_no_resid
+    my_assert_equals_thrower( "len( output_no_resid[ 0 ] )", len( output_no_resid[ 0 ] ), num_output_dimensions );
+    for x in range( 0, len( output_no_resid ) ):
+        my_assert_equals_thrower( "len(output_no_resid[x])", len(output_no_resid[x]), 1 )
+        val = output_no_resid[x][0]
+        #Stunt large values
+        if( val > 1 ):
+            val = val**0.75
+        #subtract mean of -2:
+        val += 2.0
+        #divide by span of 3:
+        val /= 3.0
+    return source_input_no_resid, ray_input_no_resid, output_no_resid
 
 def denormalize_val( val ):
-    #print( "denromalizing ", val, " to ", (math.exp( math.exp( val + 1 ) ) - 10) )
-    return math.exp( math.exp( val + 1 ) ) - 10;
+    if val <= -0.999:
+        val = -0.999
+    return math.log( val + 1.0 ) * -15.0
 
 #########
 # START #
 #########
-
-if os.path.isfile( args.model ):
-    model = load_model( args.model )
-else:
-    print( "Model " + args.model + " is not a file" )
-    exit( 1 )
-
-mse_pre_denorm = 0.
-mse_post_denorm = 0.
-mse_post_denorm_lt_0 = 0.
-mse_post_denorm_lt_n2 = 0.
-mse_post_denorm_lt_n4 = 0.
-mse_post_denorm_lt_n6 = 0.
-
-allxs = []
-allys = []
-
-xs_lt_0 = []
-ys_lt_0 = []
-
-xs_lt_n2 = []
-ys_lt_n2 = []
-
-xs_lt_n4 = []
-ys_lt_n4 = []
-
-xs_lt_n6 = []
-ys_lt_n6 = []
-
 
 # 4) Fit Model
 
@@ -274,82 +174,7 @@ for line in file_lines:
         source_input = cpp_structs[ 0 ]
         ray_input = cpp_structs[ 1 ]
         output = cpp_structs[ 2 ]
-        #source_input, ray_input, output = generate_data_from_files( line, False )
+
+        py_source_input, py_ray_input, py_output = generate_data_from_files( line, False )
     except AssertError:
         continue
-    predictions = model.predict( x=[source_input,ray_input] )
-    my_assert_equals_thrower( "len( predictions )", len( predictions ), len( output ) );
-    for i in range( 0, len( predictions ) ):
-        '''
-        denorm_val=output[ i ][ 0 ]
-        norm_val = denorm_val
-        if norm_val > 1:
-            norm_val = norm_val**0.75
-        norm_val += 2.0
-        norm_val /= 3.0
-        '''
-        norm_val=output[ i ][ 0 ]
-        denorm_val = denormalize_val( norm_val )
-
-        norm_pred=predictions[ i ][ 0 ]
-        #print( "prediction: ", predictions[ i ][ 0 ] )
-        denorm_pred = denormalize_val( norm_pred )
-
-        mse_pre_denorm += (norm_val-norm_pred)**2
-        denorm_mse = (denorm_val-denorm_pred)**2
-        mse_post_denorm += denorm_mse
-
-        #print( denorm_val, denorm_pred )
-
-        allxs.append( denorm_val )
-        allys.append( denorm_pred )
-        
-        if denorm_val < 0.:
-            xs_lt_0.append( denorm_val )
-            ys_lt_0.append( denorm_pred )
-            mse_post_denorm_lt_0 += denorm_mse
-            if denorm_val < -2.:
-                xs_lt_n2.append( denorm_val )
-                ys_lt_n2.append( denorm_pred )
-                mse_post_denorm_lt_n2 += denorm_mse
-                if denorm_val < -4.:
-                    xs_lt_n4.append( denorm_val )
-                    ys_lt_n4.append( denorm_pred )
-                    mse_post_denorm_lt_n4 += denorm_mse
-                    if denorm_val < -6.:
-                        xs_lt_n6.append( denorm_val )
-                        ys_lt_n6.append( denorm_pred )
-                        mse_post_denorm_lt_n6 += denorm_mse
-                
-mse_pre_denorm /= len(allxs)
-mse_post_denorm /= len(allxs)
-mse_post_denorm_lt_0 /= len(xs_lt_0)
-mse_post_denorm_lt_n2 /= len(xs_lt_n2)
-mse_post_denorm_lt_n4 /= len(xs_lt_n4)
-mse_post_denorm_lt_n6 /= len(xs_lt_n6)
-
-print( mse_pre_denorm, len(allxs) )
-print( mse_post_denorm, len(allxs) )
-print( mse_post_denorm_lt_0, len(xs_lt_0) )
-print( mse_post_denorm_lt_n2, len(xs_lt_n2) )
-print( mse_post_denorm_lt_n4, len(xs_lt_n4)  )
-print( mse_post_denorm_lt_n6, len(xs_lt_n6) )
-print( " " )
-print( scipy.stats.pearsonr( allxs, allys )[ 0 ] )
-print( scipy.stats.pearsonr( xs_lt_0, ys_lt_0 )[ 0 ] )
-print( scipy.stats.pearsonr( xs_lt_n2, ys_lt_n2 )[ 0 ] )
-print( scipy.stats.pearsonr( xs_lt_n4, ys_lt_n4 )[ 0 ] )
-print( scipy.stats.pearsonr( xs_lt_n6, ys_lt_n6 )[ 0 ] )
-print( " " )
-print( scipy.stats.spearmanr( allxs, allys ).correlation )
-print( scipy.stats.spearmanr( xs_lt_0, ys_lt_0 ).correlation )
-print( scipy.stats.spearmanr( xs_lt_n2, ys_lt_n2 ).correlation )
-print( scipy.stats.spearmanr( xs_lt_n4, ys_lt_n4 ).correlation )
-print( scipy.stats.spearmanr( xs_lt_n6, ys_lt_n6 ).correlation )
-print( " " )
-print( scipy.stats.kendalltau( allxs, allys ).correlation )
-print( scipy.stats.kendalltau( xs_lt_0, ys_lt_0 ).correlation )
-print( scipy.stats.kendalltau( xs_lt_n2, ys_lt_n2 ).correlation )
-print( scipy.stats.kendalltau( xs_lt_n4, ys_lt_n4 ).correlation )
-print( scipy.stats.kendalltau( xs_lt_n6, ys_lt_n6 ).correlation )
-
