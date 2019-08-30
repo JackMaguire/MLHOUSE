@@ -27,8 +27,8 @@ import subprocess
 #import scipy.stats
 
 import numba
+from numba import jit
 
-exit( 1 )
 ########
 # INIT #
 ########
@@ -63,6 +63,7 @@ args = parser.parse_args()
 # FUNCS #
 #########
 
+#@jit
 def my_assert_equals( name, actual, theoretical ):
     if actual != theoretical:
         print( str( name ) + " is equal to " + str( actual ) + " instead of " + str( theoretical ) )
@@ -71,18 +72,13 @@ def my_assert_equals( name, actual, theoretical ):
 class AssertError(Exception):
     pass
 
+#@jit
 def my_assert_equals_thrower( name, actual, theoretical ):
     if actual != theoretical:
         print( str( name ) + " is equal to " + str( actual ) + " instead of " + str( theoretical ) )
         raise AssertError
 
-#https://stackoverflow.com/questions/4601373/better-way-to-shuffle-two-numpy-arrays-in-unison
-def shuffle_in_unison(a, b):
-    rng_state = numpy.random.get_state()
-    numpy.random.shuffle(a)
-    numpy.random.set_state(rng_state)
-    numpy.random.shuffle(b)
-
+#@jit
 def assert_vecs_line_up( input, output ):
     #Each line starts with "RESID: XXX,"
     my_assert_equals_thrower( "input file length", len( input ), len( output ) )
@@ -93,6 +89,7 @@ def assert_vecs_line_up( input, output ):
         out_resid = int( out_elem.split( " " )[ 1 ] )
         my_assert_equals_thrower( "out_resid", out_resid, in_resid )
 
+#@jit
 def generate_data_from_files( filenames_csv, six_bin ):
     #dataset = numpy.genfromtxt( filename, delimiter=",", skip_header=0 )
     split = filenames_csv.split( "\n" )[ 0 ].split( "," );
@@ -150,6 +147,7 @@ def generate_data_from_files( filenames_csv, six_bin ):
         val /= 3.0
     return source_input_no_resid, ray_input_no_resid, output_no_resid
 
+@jit( nopython=True )
 def denormalize_val( val ):
     if val <= -0.999:
         val = -0.999
@@ -160,6 +158,9 @@ def denormalize_val( val ):
 #########
 
 # 4) Fit Model
+
+print( denormalize_val( 1.0 ) )
+exit( 1 )
 
 with open( args.data, "r" ) as f:
     file_lines = f.readlines()
