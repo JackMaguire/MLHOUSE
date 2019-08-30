@@ -26,8 +26,8 @@ import subprocess
 #import scipy
 #import scipy.stats
 
-import numba
-from numba import jit
+#import numba
+#from numba import jit
 
 ########
 # INIT #
@@ -69,6 +69,19 @@ def my_assert_equals( name, actual, theoretical ):
         print( str( name ) + " is equal to " + str( actual ) + " instead of " + str( theoretical ) )
         exit( 1 )
 
+#@jit
+def my_assert_close( name, actual, theoretical ):
+    if abs( actual - theoretical ) > 0.001:
+        print( str( name ) + " is equal to " + str( actual ) + " instead of " + str( theoretical ) )
+        exit( 1 )
+
+#@jit
+def my_assert( name, test ):
+    if not test:
+        print( "Failed: ", name )
+        exit( 1 )
+
+#@jit
 class AssertError(Exception):
     pass
 
@@ -89,13 +102,22 @@ def assert_vecs_line_up( input, output ):
         out_resid = int( out_elem.split( " " )[ 1 ] )
         my_assert_equals_thrower( "out_resid", out_resid, in_resid )
 
-#@jit
-def generate_data_from_files( filenames_csv, six_bin ):
-    #dataset = numpy.genfromtxt( filename, delimiter=",", skip_header=0 )
+#@jit( nopython=True )
+def denormalize_val( val ):
+    if val <= -0.999:
+        val = -0.999
+    return math.log( val + 1.0 ) * -15.0
+
+#@jit( nopython=True )
+def normalize_val( val ):
+    return math.exp( val / -15.0 ) - 1.0;
+
+def generate_data_from_files( filenames_csv ):
     split = filenames_csv.split( "\n" )[ 0 ].split( "," );
     my_assert_equals_thrower( "split.length", len( split ), 2 );
 
-    #t0 = time.time()
+    split = filenames_csv.split( "\n" )[ 0 ].split( "," );
+    my_assert_equals_thrower( "split.length", len( split ), 2 );
 
     # Both of these elements lead with a dummy
     if split[ 0 ].endswith( ".csv.gz" ):
@@ -123,44 +145,22 @@ def generate_data_from_files( filenames_csv, six_bin ):
     source_input_no_resid = input[:,1:27]
     ray_input_no_resid = input[:,27:]
 
-    #print( "output.shape:" )
-    #print( output.shape )
     output_no_resid = output[:,1:2]
-    #print( "output_no_resid.shape:" )
-    #print( output_no_resid.shape )
 
-    my_assert_equals_thrower( "len( source_input_no_resid[ 0 ] )", len( source_input_no_resid[ 0 ] ), num_source_residue_inputs );
-    my_assert_equals_thrower( "len( ray_input_no_resid[ 0 ] )",    len( ray_input_no_resid[ 0 ] ), num_ray_inputs );
+    #my_assert_equals_thrower( "len( source_input_no_resid[ 0 ] )", len( source_input_no_resid[ 0 ] ), num_source_residue_inputs );
+    #my_assert_equals_thrower( "len( ray_input_no_resid[ 0 ] )",    len( ray_input_no_resid[ 0 ] ), num_ray_inputs );
+    #my_assert_equals_thrower( "len( output_no_resid[ 0 ] )", len( output_no_resid[ 0 ] ), num_output_dimensions );
 
-    #https://www.kaggle.com/vishwasgpai/guide-for-creating-cnn-model-using-csv-file        
-
-    my_assert_equals_thrower( "len( output_no_resid[ 0 ] )", len( output_no_resid[ 0 ] ), num_output_dimensions );
     for x in range( 0, len( output_no_resid ) ):
-        my_assert_equals_thrower( "len(output_no_resid[x])", len(output_no_resid[x]), 1 )
-        val = output_no_resid[x][0]
-        #Stunt large values
-        if( val > 1 ):
-            val = val**0.75
-        #subtract mean of -2:
-        val += 2.0
-        #divide by span of 3:
-        val /= 3.0
+        #my_assert_equals_thrower( "len(output_no_resid[x])", len(output_no_resid[x]), 1 )
+        output_no_resid[x][0] = normalize_val( output_no_resid[x][0] );
     return source_input_no_resid, ray_input_no_resid, output_no_resid
-
-@jit( nopython=True )
-def denormalize_val( val ):
-    if val <= -0.999:
-        val = -0.999
-    return math.log( val + 1.0 ) * -15.0
 
 #########
 # START #
 #########
 
 # 4) Fit Model
-
-print( denormalize_val( 1.0 ) )
-exit( 1 )
 
 with open( args.data, "r" ) as f:
     file_lines = f.readlines()
@@ -171,11 +171,37 @@ for line in file_lines:
     my_assert_equals_thrower( "split.length", len( split ), 2 );
 
     try:
+        t0 = time.time()
+
         cpp_structs = jack_mouse_test.read_mouse_data( split[ 0 ], split[ 1 ] )
         source_input = cpp_structs[ 0 ]
         ray_input = cpp_structs[ 1 ]
         output = cpp_structs[ 2 ]
 
-        py_source_input, py_ray_input, py_output = generate_data_from_files( line, False )
+        t1 = time.time()
+        
+        py_source_input, py_ray_input, py_output = generate_data_from_files( line )
+
+        t2 = time.time()
+
+        cpp = t1 - t0
+        py = t2 - t1
+
+        print( py / cpp )
+
+        my_assert_equals( "#1", len(source_input), len(py_source_input) );
+        my_assert_equals( "#2", len(ray_input), len(py_ray_input) );
+        my_assert_equals( "#3", len(output), len(py_output) );
+
+        for x in range( 0, len( source_input[ 0 ] ) ):
+            my_assert_close( "#4", source_input[ 0 ][ x ], py_source_input[ 0 ][ x ] )
+
+        for x in range( 0, len( ray_input[ 0 ] ) ):
+            my_assert_close( "#5", ray_input[ 0 ][ x ], py_ray_input[ 0 ][ x ] )
+
+        for x in range( 0, len( output[ 0 ] ) ):
+            my_assert_close( "#6", output[ 0 ][ x ], py_output[ 0 ][ x ] )
     except AssertError:
         continue
+
+print( "Everything is good" )
