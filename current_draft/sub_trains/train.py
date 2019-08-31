@@ -40,7 +40,7 @@ import subprocess
 import tensorflow as tf
 #from tensorflow.keras.backend.tensorflow_backend import set_session
 
-name="base2"
+name="base2.lcn.sum.reasonablediet"
 
 '''
 #Only use part of the GPU, from https://github.com/keras-team/keras/issues/4161
@@ -130,8 +130,8 @@ else:
     exit( 1 )
 
 #0.001 is default
-#model1.optimizer.lr = 0.00025
-model1.optimizer.lr = 0.001
+#model1.optimizer.lr = 0.0002
+#model1.optimizer.lr = 0.001
 #model1.optimizer.lr = 0.005
 print( "lr:", model1.optimizer.lr )
 
@@ -164,7 +164,7 @@ for line in file_lines:
     #submitting in batches to save memory on the GPU
     #64 sometimes works, 128 is too large
     #model1.train_on_batch( x=[source_input,ray_input], y=output )
-    model1.fit( x=[source_input,ray_input], y=output, epochs=1, batch_size=32 )
+    model1.fit( x=[source_input,ray_input], y=output, epochs=1, batch_size=128 ) #32 for base2
     t2 = time.time()
     time_spent_loading += t1 - t0
     time_spent_training += t2 - t1

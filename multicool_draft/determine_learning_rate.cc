@@ -2,7 +2,7 @@
 #include <math.h>
 
 //constexpr double FLOOR = 0.0005;
-//constexpr double CEILING = 0.01;
+//constexpr double CEILING = 0.002;
 //constexpr double CEILING2 = 2.0 * CEILING;
 
 
@@ -52,8 +52,8 @@ int main( int argc, char* argv[] ){
   float const span = std::atof( argv[ 3 ] );
   float const val = std::atof( argv[ 4 ] );
 
-  //std::cout << outer_process( floor, ceiling, span, val ) << std::endl;
-  for( double x = 0.0; x <= 50.0; x += 0.1 ){
-    std::cout << x << "," << outer_process( floor, ceiling, span, x ) << std::endl;
-  }
+  std::cout << outer_process( floor, ceiling, span, val ) << std::endl;
+  // for( double x = 0.0; x <= 50.0; x += 0.1 ){
+  // std::cout << x << "," << outer_process( floor, ceiling, span, x ) << std::endl;
+  // }
 }
