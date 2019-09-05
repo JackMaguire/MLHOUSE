@@ -28,8 +28,8 @@ else
     else
 	for x in ../sub_trains/*.py; do
 	    echo $x
-	    #( python3 $x --training_data local_list.csv 2>/dev/null | tail -n 3 | head -n 1 ) || ( echo $x went bad && exit 1 )
-	    ( python3 $x --training_data local_list.csv ) || ( echo $x went bad && exit 1 )
+	    ( python3 $x --training_data local_list.csv 2>/dev/null | tail -n 3 | head -n 1 ) || ( echo $x went bad && exit 1 )
+	    #( python3 $x --training_data local_list.csv ) || ( echo $x went bad && exit 1 )
 	done
     fi
     #python3 ../train.py --training_data local_list.csv 2>/dev/null | tail -n 3
