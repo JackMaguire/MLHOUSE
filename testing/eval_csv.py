@@ -1,4 +1,4 @@
-import jack_mouse_test
+#import jack_mouse_test
 
 from random import shuffle
 
