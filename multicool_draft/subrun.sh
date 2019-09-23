@@ -31,13 +31,13 @@ else
 	for y in 0.005; do
 	    lr=$(../determine_learning_rate 0.00025 $y 4 $e)
 	    echo $e $y $lr
-	    ( python3 ../sub_trains/train.$y.py --training_data local_list.10.csv --learning_rate $lr 2>/dev/null | tail -n 3 | head -n 1 ) || ( echo $x went bad && exit 1 ) 
+	    ( python3 ../sub_trains/train.0.005.py --training_data local_list.10.csv --learning_rate $lr 2>/dev/null | tail -n 3 | head -n 1 ) || ( echo $x went bad && exit 1 ) 
 	done
     else
 	for y in 0.005; do
 	    lr=$(../determine_learning_rate 0.00025 $y 4 $e)
 	    echo $e $y $lr
-	    ( python3 ../sub_trains/train.$y.py --training_data local_list.csv --learning_rate $lr 2>/dev/null | tail -n 3 | head -n 1 ) || ( echo $x went bad && exit 1 ) 
+	    ( python3 ../sub_trains/train.0.005.py --training_data local_list.csv --learning_rate $lr 2>/dev/null | tail -n 3 | head -n 1 ) || ( echo $x went bad && exit 1 ) 
 	done
 	#for x in ../sub_trains/*.py; do
 	#    echo $x
