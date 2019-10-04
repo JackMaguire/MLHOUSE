@@ -17,21 +17,23 @@ float process(
 ){
   float const transformed_val = -val;
   float const sig = sigmoid( transformed_val );
-  return floor + ( ceiling * 2.0 * sig );
+  return floor + ( (ceiling-floor) * 2.0 * sig );
   //return sig;
 }
 
 float outer_process(
   float const floor,
   float const ceiling,
-  float const span,
+  float span,
   float val
 ){
+  if( val > 75 ) return 0.01 / val;
   // if( val >= 10.0 ) val += 10.0;
   // std::cout << val << std::endl;
 
   while( val >= (span/2.0) ){
     val -= span;
+    span += 2;
   }
 
   val += (span/2.0);
@@ -43,7 +45,7 @@ float outer_process(
 int main( int argc, char* argv[] ){
 
   if ( argc != 5 ) {
-    std::cerr << "Usage: " << argv[0] << " FLOOR CEILING SPAN EPOCH.SUBEPOCH" << std::endl;
+    std::cerr << "Usage: " << argv[0] << " FLOOR CEILING STARTSPAN EPOCH.SUBEPOCH" << std::endl;
     return 1;
   }
 
@@ -53,7 +55,7 @@ int main( int argc, char* argv[] ){
   float const val = std::atof( argv[ 4 ] );
 
   std::cout << outer_process( floor, ceiling, span, val ) << std::endl;
-  // for( double x = 0.0; x <= 50.0; x += 0.1 ){
+  //for( double x = 0.0; x <= 100.0; x += 0.1 ){
   // std::cout << x << "," << outer_process( floor, ceiling, span, x ) << std::endl;
-  // }
+  //}
 }

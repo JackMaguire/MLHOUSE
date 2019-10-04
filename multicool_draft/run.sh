@@ -21,7 +21,7 @@ get_next_dir_num(){
 
 setup_next_dir(){
     next_dir_num=$1
-    bash subrun.sh $next_dir_num dummy_lr 1
+    bash subrun.sh $next_dir_num dummy_ep 1
 }
 
 # Clean up from previous attempt
@@ -52,14 +52,15 @@ for epoch in {0..1000}; do
     for subepoch in {0..9}; do
 	next_dir=`get_next_dir_num`
 
-	lr=`./determine_learning_rate $epoch.$subepoch`
-	echo lr $lr
+	#lr=`./determine_learning_rate $epoch.$subepoch`
+	#echo lr $lr
+	ep=$epoch.$subepoch
 
 	#At this moment, curr is ready to run and next does not exist
 
 	# 1
 	echo "START " `date`
-	echo 1 2 | xargs -n 1 -P 2 bash subrun.sh $next_dir $lr
+	echo 1 2 | xargs -n 1 -P 2 bash subrun.sh $next_dir $ep
 	if [[ `ls final.*.h5 | wc -l` -ne `ls current.*.h5 | wc -l` ]]; then
 	    echo "finals where not created"
 	    ls
