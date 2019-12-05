@@ -82,6 +82,8 @@ parser = argparse.ArgumentParser()
 
 parser.add_argument( "--model", help="Most recent model file", required=True )
 
+parser.add_argument( "--prefix", help="Prefix for PDFs", default="" )
+
 parser.add_argument( "--data", help="CSV where each line has two elements. First element is the absolute path to the input csv file, second element is the absolute path to the corresponding output csv file.", required=True )
 # Example: "--data foo.csv" where foo.csv looks like:
 # /home/jack/input.1.csv,/home/jack/output.1.csv
@@ -266,6 +268,9 @@ def display4( pred, filename ):
     #plt.subplots_adjust(wspace=-0.2, hspace=0.1)
     #Good for 12
     #plt.subplots_adjust(wspace=-0.9, hspace=0.1)
+
+    #layer 6 movies hefty
+    plt.subplots_adjust(wspace=-0.95, hspace=0.1)
     plt.savefig( filename, bbox_inches='tight' )
 
 # 4) Fit Model
@@ -397,7 +402,10 @@ for line in file_lines:
                 plt.savefig( str(i) + '_' + str(j) + '.pdf' )
             '''
             plt.close('all')
-            display4( pred, str(i) + '.pdf' )
+            if len( args.prefix ) > 0:
+                display4( pred, args.prefix + "." + str(i) + '.pdf' )
+            else:
+                display4( pred, str(i) + '.pdf' )
             pass
         elif length1 == 2:
             x = pred.shape[ 1 ]
@@ -409,8 +417,10 @@ for line in file_lines:
                 test[0][j] = pred[0][j]
             plt.matshow( test, cmap='viridis', vmin=get_vmin(), vmax=get_vmax())
             plt.axis('off')
-            plt.savefig( str(i) + '.pdf' )
-            pass
+            if len( args.prefix ) > 0:
+                plt.savefig( args.prefix + "." + str(i) + '.pdf' )
+            else:
+                plt.savefig( str(i) + '.pdf' )
         else:
             print( "length1 == ", length1, ", not printing" )
             exit( 1 )
